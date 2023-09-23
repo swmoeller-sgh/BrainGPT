@@ -1,0 +1,7 @@
+.env
+.DS_store
+tree_structure.md
+/data
+/models/10_trained_models
+/models/99_backup
+/tests

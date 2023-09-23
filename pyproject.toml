@@ -1,0 +1,57 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "BrainGPT"
+version = "0.1.0"
+
+# The summary description of the project.
+description = "GPTize across your own private data"
+requires-python = ">=3.11"
+
+# The keywords for the project
+keywords = ["little", "helper", "dataframes", "time series", "nlp", "images"]
+
+authors = [
+    {name = "Stefan W. Moeller", email = "st.w.moeller@web.de"},
+    {name = "swmoeller-sgh", email = "98546990+swmoeller-sgh@users.noreply.github.com"},
+]
+
+maintainers = [
+    {name = "Stefan W. Moeller", email = "st.w.moeller@web.de"}
+]
+
+
+# A single pyproject.toml file can only have one of the following.
+readme = "README.md"
+
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+dependencies = [
+    "pandas>=2.0.3",
+    "numpy>=1.25.1",
+    "matplotlib>=3.7.2",
+    "tk>=0.1.0",
+    "statsmodels>=0.14.0",
+    "scipy>=1.9.3",
+    #    "helper-collection @ file:///Users/swmoeller/python/05_packages/built_packages/helper_collection-1.0.0-py3-none-any.whl",
+    "mysql-connector-python>=8.1.0",
+]   
+
+package-dir = "src"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/me/spam.git"
+Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
