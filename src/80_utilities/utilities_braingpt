@@ -1,0 +1,30 @@
+import os
+
+# Function to find the project root directory
+def find_project_root(start_dir):
+    current_dir = os.path.abspath(start_dir)
+    
+    while True:
+        # Check if the marker file exists in the current directory
+        marker_file = os.path.join(current_dir, ".project_root")
+        if os.path.isfile(marker_file):
+            return current_dir
+        
+        # Move up one directory
+        parent_dir = os.path.dirname(current_dir)
+        
+        # If we haven't reached the root directory (i.e., /), continue searching
+        if current_dir == parent_dir:
+            break
+        current_dir = parent_dir
+    
+    # If no marker file is found, return None or handle it as needed
+    return None
+
+# Find the project root directory starting from the current script's directory
+project_root = find_project_root(os.path.dirname(os.path.abspath(__file__)))
+
+if project_root:
+    print(f"Project root directory: {project_root}")
+else:
+    print("Project root not found.")
