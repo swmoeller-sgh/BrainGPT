@@ -292,15 +292,16 @@ def get_available_loader_types(loader_mapping):
 
 def split_doc_into_chunks(IN_document):
 
-    texts = []
+    chunks = []
     if len(IN_document) != 0:
         # Split the documents
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        texts = text_splitter.split_documents(IN_document)
+        chunks = text_splitter.split_documents(IN_document)
+        logging.info("Splitting of document <%s> done with <%s> chunks",IN_document, len(chunks))
     else:
-        print("[ERROR] No documents loaded!")
+        logging.error("No document found for splitting.")
         
-    return(texts)
+    return(chunks)
 
 
 
@@ -328,13 +329,12 @@ def process_document_list(IN_file_list, IN_valid_extensions):
                 loader_class, loader_args = LOADER_MAPPING[file_extension]
                 loader = loader_class(file_path, **loader_args)
                 document = loader.load()
+                logging.info("Document %s loaded.", file_name)
                 text_chunks= split_doc_into_chunks(document)
-                print(text_chunks)
-
-
+               
                 # Perform processing steps here (e.g., load the file)
                 # After processing, update the 'Status' to 'imported'
-                print("Alles klar")
+               
                 IN_file_list.at[index, 'Status'] = 'imported'
             else:
                 IN_file_list.at[index, 'Status'] = 'no loader available'
@@ -362,8 +362,6 @@ def main_execution():
     # process the document_list and import/flag the documents
     document_list_df = process_document_list(IN_file_list=document_list_df,
                                              IN_valid_extensions=valid_extension)
-
-
 
 
 
