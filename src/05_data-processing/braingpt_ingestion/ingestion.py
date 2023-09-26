@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """ 
 [Purpose]
 =========
@@ -12,20 +11,16 @@ Duplicates are checked and excluded. Imported documents are maintained in an imp
 
 
 """
-ROOT_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT"
-# // TODO - using function from utilities_braingpt, automatize identification of root-directory
-
 
 # [IMPORTS of modules and packages]
 
-import logging 
+import logging
+import os # Operating System module for interacting with the OS environment
+import uuid # Universally Unique Identifier (UUID) module for generating unique identifiers
 
+from typing import List # Typing module for defining type hints
 from dotenv import load_dotenv # Dotenv library for loading environment variables from a file
 
-import os # Operating System module for interacting with the OS environment
-
-import uuid # Universally Unique Identifier (UUID) module for generating unique identifiers
-from typing import List # Typing module for defining type hints
 import magic # Magic library for determining the file type of a file
 
 import openai # OpenAI library for working with OpenAI's GPT-3 or other models
@@ -69,6 +64,8 @@ logging.info("Start of script execution")
 
 # [IMPORTS of environment constants]
 load_dotenv()   # load environmental variables
+ROOT_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT"
+# // TODO - using function from utilities_braingpt, automatize identification of root-directory
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -107,7 +104,7 @@ LOADER_MAPPING = {
     # Add more mappings for other file extensions and loaders as needed
 }
 
-
+DOC2SCAN_DATA_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw"
 
 
 
@@ -152,11 +149,11 @@ def open_import_tracking(IN_tracking_file: str) -> pd.DataFrame:
 
     """
     if os.path.isfile(IN_tracking_file):
-        logging.info("Loading import tracking file <%s>.", IN_tracking_file)
+        logging.info("Loading import tracking file <%s> into panda dataframe.", IN_tracking_file)
         return pd.read_csv(IN_tracking_file)
     else:
-        logging.error("Import tracking file <%s> is missing. Creating a new empty file.", IN_tracking_file)
-        columns = ["uuid", "file_path", "type of file", "import status"]
+        logging.error("Import tracking file <%s> is missing. Creating a new panda dataframe.", IN_tracking_file)
+        columns = ["File Name", "File Path", "UUID", "File Extension", "Type of File", "Status"]
         return pd.DataFrame(columns=columns)
 
 
@@ -198,7 +195,7 @@ def get_all_file_paths(directory_path):
 # generate an uuid for a document
 def get_uuid5(IN_file):
     unique_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, IN_file))
-    return(unique_id)
+    return unique_id
 
 
 
@@ -207,40 +204,177 @@ def generate_import_list(in_source_directory: str):
     for root, _, files in os.walk(in_source_directory):
         for file in files:
             file_path = os.path.join(root, file)
-            file_uuid = get_uuid5(file_path)
+            file_name = os.path.basename(file_path)
+            file_extension = os.path.splitext(file_name)[1]
+            file_uuid = get_uuid5(file_name)
             file_type = type(file_path)
-            file_info.append({"File Path": file_path,
+            file_info.append({"File Name" : file_name,
+                              "File Path": file_path,
                               "UUID": file_uuid,
+                              "File Extension": file_extension,
                               "Type of File": file_type,
-                              "Status": "Not Processed"  # Initial status
+                              "Status": "not processed"  # Initial status
                               })
     df_result = pd.DataFrame(file_info)
     return df_result
 
-# determine available loaders based on their extension
-available_loader_types = [ext.lstrip(".") for ext in LOADER_MAPPING.keys()]
+
+def merge_dataframes(IN_main_df, IN_tmp_df):
+    """
+    Merge two DataFrames based on unique combinations of "File Path" and "UUID" columns.
+
+    This function takes two input DataFrames, IN_main_df and IN_tmp_df, and combines them
+    into a single DataFrame. It handles two distinct cases:
+
+    1. If a row with the same "UUID" exists in IN_main_df but has a different "File Path",
+       the "Status" for the matching rows is set to "duplicate?".
+
+    2. If a row with the same "UUID" and "File Path" combination does not exist in IN_main_df,
+       a new row is added with "Status" set to "import".
+
+    Parameters:
+    - IN_main_df (DataFrame): The main DataFrame to which the data will be merged.
+    - IN_tmp_df (DataFrame): The temporary DataFrame containing additional data to merge.
+
+    Returns:
+    DataFrame: A new DataFrame containing the merged data.
+
+    Example:
+    ```python
+    # Sample DataFrames
+    main_df = pd.DataFrame({'File Path': ['path1', 'path2'], 'UUID': ['uuid1', 'uuid2']})
+    tmp_df = pd.DataFrame({'File Path': ['path2', 'path3'], 'UUID': ['uuid2', 'uuid3']})
+
+    # Merge the DataFrames
+    result_df = merge_dataframes(main_df, tmp_df)
+
+    # Resulting DataFrame will contain unique rows from main_df and tmp_df with appropriate "Status" values.
+    ```
+    """
+    df1 = IN_main_df.copy()
+    df2 = IN_tmp_df
+
+    # Identify rows with the same UUID but different File Path in df1
+    duplicate_rows = df1[df1.duplicated(subset=['UUID'], keep=False)]
+
+    # Filter DF2 for unique combinations of "File Path" and "UUID" not in DF1
+    unique_rows_df2 = df2[~df2.set_index(["File Path", "UUID"]).index.isin(df1.set_index(["File Path", "UUID"]).index)]
+
+    # Set the "Status" column for the filtered rows to "import"
+    unique_rows_df2["Status"] = "import"
+
+    # Set the "Status" column for duplicate rows to "duplicate?"
+    df1.loc[duplicate_rows.index, "Status"] = "duplicate?"
+
+    # Concatenate DF1 and the filtered DF2
+    combined_df = pd.concat([df1, unique_rows_df2], ignore_index=True)
+
+    logging.info("Pandas Dataframe updated with files 'to be imported' or 'duplicated'.")
+    return combined_df
+
+
+def get_available_loader_types(loader_mapping):
+    """
+    Get available loader types based on their extension from a loader mapping dictionary.
+
+     Parameters:
+    - loader_mapping (dict): A dictionary mapping file extensions to loader types.
+
+    Returns:
+    list: A list of available loader types.
+    """
+    # available_loader_types = [ext.lstrip(".") for ext in loader_mapping.keys()]
+    available_loader_types = list(loader_mapping.keys())
+    logging.info("Possible file.extensions for document loader analyzed and list of extensions generated.")
+
+    return available_loader_types
+
+
+def split_doc_into_chunks(IN_document):
+
+    texts = []
+    if len(IN_document) != 0:
+        # Split the documents
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        texts = text_splitter.split_documents(IN_document)
+    else:
+        print("[ERROR] No documents loaded!")
+        
+    return(texts)
+
+
+
+
+def process_document_list(IN_file_list, IN_valid_extensions):
+    """
+    Process each row of the DataFrame and update the 'Status' column accordingly.
+
+    Parameters:
+    - df (DataFrame): The DataFrame containing the data to be processed.
+
+    Returns:
+    DataFrame: The DataFrame with updated 'Status' values.
+    """
+    for index, row in IN_file_list.iterrows():
+        if row['Status'] == "import":
+            file_path = row["File Path"]
+            file_name = row["File Name"]
+            file_extension = row["File Extension"]
+            print(file_name, file_path, file_extension)
+            print(IN_valid_extensions)
+
+            if file_extension in IN_valid_extensions:
+                # Load the document
+                loader_class, loader_args = LOADER_MAPPING[file_extension]
+                loader = loader_class(file_path, **loader_args)
+                document = loader.load()
+                text_chunks= split_doc_into_chunks(document)
+                print(text_chunks)
+
+
+                # Perform processing steps here (e.g., load the file)
+                # After processing, update the 'Status' to 'imported'
+                print("Alles klar")
+                IN_file_list.at[index, 'Status'] = 'imported'
+            else:
+                IN_file_list.at[index, 'Status'] = 'no loader available'
+                logging.error("No document loader found!")
+
+    return IN_file_list
+
+
 
 
 def main_execution():
-    # open panda dataframe with list of already loaded documents. if not existing, establish pd dataframe
-	import_tracking_df = open_import_tracking(IN_tracking_file= IMPORT_LOG_FILE)
-    
-	# generate a list of all documents in import dir
-	tmp_import_df = generate_import_list(in_source_directory="/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw")
-	print(tmp_import_df)
-    
-	# Case
-	# 1) document existiert in import-liste in same folder
-	#    --> log Eintrag, no further action
+    # open pd dataframe with list of already loaded documents. if not existing, establish pd dataframe
+    import_tracking_df = open_import_tracking(IN_tracking_file=IMPORT_LOG_FILE)
 
-	# 2) same document exist, but in different folder
-	#    --> Status Eintrag in import-log: file existiert in anderen Verzeichnis
-	
-	# 3) document does not exist, but no loader available
-	#    --> Status Eintrag in import-log: missing importer
+	# generate a list of all documents in import dir
+    tmp_import_df = generate_import_list(in_source_directory=DOC2SCAN_DATA_DIR)
+
+    # match both dataframes and mark sets to be imported with "import" or "duplicate"
+    document_list_df = merge_dataframes(import_tracking_df, tmp_import_df)
+
+    # generate the list of possible extensions from the document loader
+    valid_extension = get_available_loader_types(loader_mapping=LOADER_MAPPING)
+
+
+    # process the document_list and import/flag the documents
+    document_list_df = process_document_list(IN_file_list=document_list_df,
+                                             IN_valid_extensions=valid_extension)
+
+
+
+
+
+    # go through dataframe for all entries with status "import"
+
+	# 3) document does  exist, but no loader available
+	#    --> Status Update in import-log: missing importer
 
 	# 4) document does not exist, loader is available
-	#    --> new enty in import log with status: loaded
+	#    --> new enty in import log with status: imported
+
 	 	# load the document
 
 		# convert it into text
@@ -249,13 +383,14 @@ def main_execution():
 
         # save it to vectorstore
 
+    document_list_df.to_csv(IMPORT_LOG_FILE, index=False)
 
-# ===================  
-# MAIN  
+
+# ===================
+# MAIN
 # ===================
 
 if __name__ == "__main__":
     # Code that runs when the script is executed directly
     main_execution()
     logging.info("End of script execution\n\n")
-
