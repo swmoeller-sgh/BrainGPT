@@ -360,18 +360,20 @@ def existence_vectorstore(IN_datastore_location: str) -> bool:
 
 def update_vectorstore(IN_datastore_location: str, IN_embedding_function, IN_chromadb_setting, IN_text_chunks):
     if existence_vectorstore(IN_datastore_location=IN_datastore_location) is True:
-        print("[INFO] A vectorstore exists. I will append to this one!")
 
         # loading the vectorstore
         vectordb = Chroma(persist_directory=IN_datastore_location, 
                         embedding_function=IN_embedding_function,
                         client_settings=IN_chromadb_setting)
-        
+        logging.info("Vectorstore loaded from loction <%s>", IN_datastore_location)
+
+
         # adding documents
         vectordb.add_documents(IN_text_chunks)
+        logging.info("In total, %s file chunks were imported into the vectorstore.", len(text_chunks))
 
     else:
-        print("[INFO] No vectorstore exists. I will create a new one for you!")
+        logging.error("No vectorstore exists. New store established in <%s>.", IN_datastore_location)
         vectordb = Chroma.from_documents(documents=IN_text_chunks, 
                                 embedding=IN_embedding_function, 
                                 persist_directory=IN_datastore_location, 
@@ -402,7 +404,7 @@ def main_execution():
     # initializing the vectorstore
     embeddings = OpenAIEmbeddings()
 
-
+    logging.info("In total, %s file chunks due to be imported into the vectorstore.", len(text_chunks))
     update_vectorstore(IN_datastore_location=PROCESSED_DATA_DIR,
                        IN_embedding_function= embeddings,
                        IN_chromadb_setting=CHROMA_SETTINGS,
@@ -410,6 +412,7 @@ def main_execution():
 
   
     document_list_df.to_csv(IMPORT_LOG_FILE, index=False)
+    logging.info("Document import list saved.")
 
 
 # ===================
