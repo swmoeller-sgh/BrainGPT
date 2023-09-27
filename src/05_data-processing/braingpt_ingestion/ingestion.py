@@ -56,7 +56,7 @@ from chromadb.config import Settings # Importing a specific configuration settin
 
 # [LOGGING settings]
 logging.basicConfig(level = logging.INFO,
-                    format = "Date-Time : %(asctime)s : %(levelname)s : Line No. : %(lineno)d - %(message)s",
+                    format = "%(asctime)s : %(levelname)s : Line No. : %(lineno)d - %(message)s",
                     filename = 'braingpt.log',
                     filemode = 'a')
 logging.info("Start of script execution")
@@ -297,13 +297,11 @@ def split_doc_into_chunks(IN_document):
         # Split the documents
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         chunks = text_splitter.split_documents(IN_document)
-        logging.info("Splitting of document <%s> done with <%s> chunks",IN_document, len(chunks))
+
     else:
         logging.error("No document found for splitting.")
         
     return(chunks)
-
-
 
 
 def process_document_list(IN_file_list, IN_valid_extensions):
@@ -316,13 +314,12 @@ def process_document_list(IN_file_list, IN_valid_extensions):
     Returns:
     DataFrame: The DataFrame with updated 'Status' values.
     """
+    text_chunks = []
     for index, row in IN_file_list.iterrows():
         if row['Status'] == "import":
             file_path = row["File Path"]
             file_name = row["File Name"]
             file_extension = row["File Extension"]
-            print(file_name, file_path, file_extension)
-            print(IN_valid_extensions)
 
             if file_extension in IN_valid_extensions:
                 # Load the document
@@ -331,18 +328,57 @@ def process_document_list(IN_file_list, IN_valid_extensions):
                 document = loader.load()
                 logging.info("Document %s loaded.", file_name)
                 text_chunks= split_doc_into_chunks(document)
+                logging.info("Splitting of document <%s> done with <%s> chunks",file_name, len(text_chunks))
                
                 # Perform processing steps here (e.g., load the file)
                 # After processing, update the 'Status' to 'imported'
                
                 IN_file_list.at[index, 'Status'] = 'imported'
+
             else:
                 IN_file_list.at[index, 'Status'] = 'no loader available'
                 logging.error("No document loader found!")
 
-    return IN_file_list
+    return IN_file_list, text_chunks
 
 
+
+def existence_vectorstore(IN_datastore_location: str) -> bool:
+    """
+    Checks if vectorstore exists
+    """
+    if os.path.exists(os.path.join(IN_datastore_location, 'index')):
+        if os.path.exists(os.path.join(IN_datastore_location, 'chroma-collections.parquet')) and os.path.exists(os.path.join(IN_datastore_location, 'chroma-embeddings.parquet')):
+            list_index_files = os.path.join(IN_datastore_location, 'index/*.bin')
+            list_index_files += os.path.join(IN_datastore_location, 'index/*.pkl')
+            # At least 3 documents are needed in a working vectorstore
+            if len(list_index_files) > 3:
+                return True
+    return False
+
+
+
+def update_vectorstore(IN_datastore_location: str, IN_embedding_function, IN_chromadb_setting, IN_text_chunks):
+    if existence_vectorstore(IN_datastore_location=IN_datastore_location) is True:
+        print("[INFO] A vectorstore exists. I will append to this one!")
+
+        # loading the vectorstore
+        vectordb = Chroma(persist_directory=IN_datastore_location, 
+                        embedding_function=IN_embedding_function,
+                        client_settings=IN_chromadb_setting)
+        
+        # adding documents
+        vectordb.add_documents(IN_text_chunks)
+
+    else:
+        print("[INFO] No vectorstore exists. I will create a new one for you!")
+        vectordb = Chroma.from_documents(documents=IN_text_chunks, 
+                                embedding=IN_embedding_function, 
+                                persist_directory=IN_datastore_location, 
+                                client_settings=IN_chromadb_setting)
+
+    # saving the vectorstore
+    vectordb.persist()
 
 
 def main_execution():
@@ -360,27 +396,19 @@ def main_execution():
 
 
     # process the document_list and import/flag the documents
-    document_list_df = process_document_list(IN_file_list=document_list_df,
-                                             IN_valid_extensions=valid_extension)
+    document_list_df, text_chunks = process_document_list(IN_file_list=document_list_df,
+                                                          IN_valid_extensions=valid_extension)
+
+    # initializing the vectorstore
+    embeddings = OpenAIEmbeddings()
 
 
+    update_vectorstore(IN_datastore_location=PROCESSED_DATA_DIR,
+                       IN_embedding_function= embeddings,
+                       IN_chromadb_setting=CHROMA_SETTINGS,
+                       IN_text_chunks=text_chunks)
 
-    # go through dataframe for all entries with status "import"
-
-	# 3) document does  exist, but no loader available
-	#    --> Status Update in import-log: missing importer
-
-	# 4) document does not exist, loader is available
-	#    --> new enty in import log with status: imported
-
-	 	# load the document
-
-		# convert it into text
-
-		# chunk it
-
-        # save it to vectorstore
-
+  
     document_list_df.to_csv(IMPORT_LOG_FILE, index=False)
 
 

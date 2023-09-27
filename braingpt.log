@@ -1,102 +1,27 @@
-    Date-Time : 2023-09-24 21:24:28,983 : Line No. : 54 - Start of script execution
-Date-Time : 2023-09-24 21:24:28,984 : Line No. : 58 - The following environment constants were established
-Date-Time : 2023-09-24 21:24:28,985 : Line No. : 64 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-
-Date-Time : 2023-09-25 12:47:00,454 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 12:47:00,457 : Line No. : 76 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-
-Date-Time : 2023-09-25 12:47:03,891 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 12:47:03,893 : Line No. : 76 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-
-Date-Time : 2023-09-25 12:55:49,228 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 12:55:49,230 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-
-Date-Time : 2023-09-25 12:55:49,230 : Line No. : 78 - Storage for processed data: /logs/file_import_log.csv
-
-Date-Time : 2023-09-25 12:57:11,416 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 12:57:11,418 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 12:57:11,418 : Line No. : 78 - Storage for processed data: /logs/file_import_log.csv
-Date-Time : 2023-09-25 13:00:28,895 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 13:00:28,897 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:00:28,897 : Line No. : 78 - Log file on imported documents: /logs/file_import_log.csv
-Date-Time : 2023-09-25 13:03:41,338 : Line No. : 67 - 
-
-Start of script execution
-Date-Time : 2023-09-25 13:03:41,340 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:03:41,340 : Line No. : 78 - Log file on imported documents: /logs/file_import_log.csv
-Date-Time : 2023-09-25 13:04:39,721 : Line No. : 67 - \Start of script execution
-Date-Time : 2023-09-25 13:04:39,723 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:04:39,724 : Line No. : 78 - Log file on imported documents: /logs/file_import_log.csv
+2023-09-27 22:16:03,054 : INFO : Line No. : 62 - Start of script execution
+2023-09-27 22:16:03,056 : INFO : Line No. : 73 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
+2023-09-27 22:16:03,056 : INFO : Line No. : 76 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
+2023-09-27 22:16:03,056 : INFO : Line No. : 79 - Source directory for documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw/doc2scan
+2023-09-27 22:16:03,058 : ERROR : Line No. : 155 - Import tracking file </Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv> is missing. Creating a new panda dataframe.
+2023-09-27 22:16:03,062 : INFO : Line No. : 272 - Pandas Dataframe updated with files 'to be imported' or 'duplicated'.
+2023-09-27 22:16:03,062 : INFO : Line No. : 288 - Possible file.extensions for document loader analyzed and list of extensions generated.
+2023-09-27 22:16:13,462 : INFO : Line No. : 328 - Document Die Dritte Dimension - Martin Pfiffner.pdf loaded.
+2023-09-27 22:16:13,483 : INFO : Line No. : 330 - Splitting of document <Die Dritte Dimension - Martin Pfiffner.pdf> done with <1404> chunks
+2023-09-27 22:16:19,097 : INFO : Line No. : 328 - Document Bosch_Washing_Machine.pdf loaded.
+2023-09-27 22:16:19,100 : INFO : Line No. : 330 - Splitting of document <Bosch_Washing_Machine.pdf> done with <105> chunks
+2023-09-27 22:16:19,100 : INFO : Line No. : 328 - Document state_of_the_union.txt loaded.
+2023-09-27 22:16:19,101 : INFO : Line No. : 330 - Splitting of document <state_of_the_union.txt> done with <42> chunks
+2023-09-27 22:16:19,335 : INFO : Line No. : 328 - Document Regulierung_von_Large_Language_Models_in_DSA_und_AIA-E_-_beck-online.pdf loaded.
+2023-09-27 22:16:19,336 : INFO : Line No. : 330 - Splitting of document <Regulierung_von_Large_Language_Models_in_DSA_und_AIA-E_-_beck-online.pdf> done with <22> chunks
+2023-09-27 22:16:19,347 : WARNING : Line No. : 25 - Unable to connect optimized C data functions [No module named 'clickhouse_connect.driverc.buffer'], falling back to pure Python
+2023-09-27 22:16:19,347 : WARNING : Line No. : 33 - Unable to connect ClickHouse Connect C to Numpy API [No module named 'clickhouse_connect.driverc.npconv'], falling back to pure Python
+2023-09-27 22:16:19,424 : INFO : Line No. : 45 - Using python library for writing JSON byte strings
+2023-09-27 22:16:19,498 : INFO : Line No. : 464 - No existing DB found in /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed, skipping load
+2023-09-27 22:16:19,499 : INFO : Line No. : 476 - No existing DB found in /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed, skipping load
+2023-09-27 22:16:19,806 : INFO : Line No. : 67 - message='Request to OpenAI API' method=post path=https://api.openai.com/v1/embeddings
+2023-09-27 22:16:22,179 : INFO : Line No. : 67 - message='OpenAI API response' path=https://api.openai.com/v1/embeddings processing_ms=147 request_id=a210bf4b4aaa1b4c6be65e61065625db response_code=200
+2023-09-27 22:16:22,285 : INFO : Line No. : 424 - Persisting DB to disk, putting it in the save folder: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
+2023-09-27 22:16:22,295 : INFO : Line No. : 422 - End of script execution
 
 
-Date-Time : 2023-09-25 13:05:09,388 : Line No. : 67 - \Start of script execution
-Date-Time : 2023-09-25 13:05:09,390 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:05:09,390 : Line No. : 78 - Log file on imported documents: /logs/file_import_log.csv
-
-
-Date-Time : 2023-09-25 13:07:23,411 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 13:07:23,413 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:07:23,413 : Line No. : 78 - Log file on imported documents: /logs/file_import_log.csv
-
-
-Date-Time : 2023-09-25 13:08:51,547 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 13:08:51,549 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:08:51,549 : Line No. : 78 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-
-
-Date-Time : 2023-09-25 13:47:07,093 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 13:47:07,095 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 13:47:07,095 : Line No. : 78 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-
-
-Date-Time : 2023-09-25 21:00:15,739 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 21:00:15,741 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 21:00:15,741 : Line No. : 78 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-
-
-Date-Time : 2023-09-25 21:00:15,747 : Line No. : 130 - Missing import tracking file. New import log file established!
-Date-Time : 2023-09-25 21:01:35,396 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 21:01:35,398 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 21:01:35,398 : Line No. : 78 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-
-
-Date-Time : 2023-09-25 21:01:35,402 : Line No. : 130 - Missing import tracking file. New import log file established!
-Date-Time : 2023-09-25 21:01:35,402 : Line No. : 200 - End of script execution
-
-
-Date-Time : 2023-09-25 21:03:38,078 : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 21:03:38,080 : Line No. : 75 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 21:03:38,080 : Line No. : 78 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-Date-Time : 2023-09-25 21:03:38,084 : Line No. : 130 - Missing import tracking file. New import log file established!
-Date-Time : 2023-09-25 21:03:38,085 : Line No. : 200 - End of script execution
-
-
-Date-Time : 2023-09-25 21:16:10,914 : INFO : Line No. : 68 - Start of script execution
-Date-Time : 2023-09-25 21:16:10,917 : INFO : Line No. : 76 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 21:16:10,917 : INFO : Line No. : 79 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-Date-Time : 2023-09-25 21:16:10,923 : ERROR : Line No. : 131 - Missing import tracking file. New import log file established!
-Date-Time : 2023-09-25 21:16:10,923 : INFO : Line No. : 201 - End of script execution
-
-
-Date-Time : 2023-09-25 22:39:10,801 : INFO : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 22:39:10,803 : INFO : Line No. : 76 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 22:39:10,803 : INFO : Line No. : 79 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-Date-Time : 2023-09-25 22:39:10,805 : ERROR : Line No. : 154 - Import tracking file </Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv> is missing. Creating a new empty file.
-Date-Time : 2023-09-25 22:39:10,808 : INFO : Line No. : 255 - End of script execution
-
-
-Date-Time : 2023-09-25 22:39:45,647 : INFO : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 22:39:45,649 : INFO : Line No. : 76 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 22:39:45,649 : INFO : Line No. : 79 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-Date-Time : 2023-09-25 22:39:45,651 : ERROR : Line No. : 154 - Import tracking file </Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv> is missing. Creating a new empty file.
-Date-Time : 2023-09-25 22:39:45,658 : INFO : Line No. : 256 - End of script execution
-
-
-Date-Time : 2023-09-25 22:44:35,165 : INFO : Line No. : 67 - Start of script execution
-Date-Time : 2023-09-25 22:44:35,167 : INFO : Line No. : 76 - Storage for processed data: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
-Date-Time : 2023-09-25 22:44:35,167 : INFO : Line No. : 79 - Log file on imported documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv
-Date-Time : 2023-09-25 22:44:35,168 : INFO : Line No. : 82 - Source directory for documents: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw/doc2scan
-Date-Time : 2023-09-25 22:44:35,170 : ERROR : Line No. : 158 - Import tracking file </Users/swmoeller/python/2023/large_language_model/BrainGPT/logs/file_import_log.csv> is missing. Creating a new empty file.
-Date-Time : 2023-09-25 22:44:35,182 : INFO : Line No. : 260 - End of script execution
-
-
+2023-09-27 22:16:22,296 : INFO : Line No. : 424 - Persisting DB to disk, putting it in the save folder: /Users/swmoeller/python/2023/large_language_model/BrainGPT/data/25_processed
