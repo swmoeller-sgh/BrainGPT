@@ -30,11 +30,8 @@ from langchain.document_loaders import TextLoader  # Text document loading for l
 from langchain.vectorstores import Chroma  # Vector storage for langchain
 from langchain.embeddings import OpenAIEmbeddings  # Embeddings for langchain
 from langchain.text_splitter import RecursiveCharacterTextSplitter  # Text splitting for langchain
-from langchain.llms import OpenAI  # Language Model for langchain
-from langchain.chains import VectorDBQA  # Vector Database Question-Answering for langchain
-from langchain.chains import RetrievalQA  # Retrieval-based Question-Answering for langchain
 
-
+#pylint: disable=W0611, W0404
 from langchain.document_loaders import (
     CSVLoader,  # Handles loading text from CSV files.
     EverNoteLoader,  # Handles loading text from Evernote documents.
@@ -50,7 +47,7 @@ from langchain.document_loaders import (
 )
 
 from chromadb.config import Settings # Importing a specific configuration settings modul
-
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # [LOGGING settings]
 logging.basicConfig(level = logging.INFO,
@@ -65,15 +62,15 @@ load_dotenv()   # load environmental variables
 ROOT_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT"
 # // TODO - using function from utilities_braingpt, automatize identification of root-directory
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
-PROCESSED_DATA_DIR = os.path.join(ROOT_DIR, os.getenv("PROCESSED_DATA_DIR"))
-logging.info("Storage for processed data: %s",PROCESSED_DATA_DIR)
+PROCESSED_DATA_DIR = os.path.join(ROOT_DIR, str(os.getenv("PROCESSED_DATA_DIR")))
+logging.info("Log file on imported documents: %s", PROCESSED_DATA_DIR)
 
-IMPORT_LOG_FILE = os.path.join(ROOT_DIR, os.getenv("LOG_DIR"), os.getenv("IMPORT_LOG_NAME"))
+IMPORT_LOG_FILE = os.path.join(ROOT_DIR, str(os.getenv("LOG_DIR")),
+                               str(os.getenv("IMPORT_LOG_NAME")))
 logging.info("Log file on imported documents: %s",IMPORT_LOG_FILE)
 
-DOC2SCAN_DATA_DIR = os.path.join(ROOT_DIR, os.getenv("DOC2SCAN_DATA_DIR"))
+DOC2SCAN_DATA_DIR = os.path.join(ROOT_DIR, str(os.getenv("DOC2SCAN_DATA_DIR")))
 logging.info("Source directory for documents: %s\n",DOC2SCAN_DATA_DIR)
 
 
@@ -105,7 +102,6 @@ LOADER_MAPPING = {
 DOC2SCAN_DATA_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw"
 
 
-
 # [CLASS definition]
 
 
@@ -116,13 +112,13 @@ DOC2SCAN_DATA_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT/
 
 # helper functions
 
-def open_import_tracking(IN_tracking_file: str) -> pd.DataFrame:
+def open_import_tracking(in__tracking_file: str) -> pd.DataFrame:
     """
     Check if the import tracking data file with a list of imported files and their UUIDs exists.
     
     Parameters
     ----------
-    IN_tracking_file : str
+    in__tracking_file : str
         The path to the import tracking data file.
 
     Returns
@@ -147,22 +143,23 @@ def open_import_tracking(IN_tracking_file: str) -> pd.DataFrame:
 
     """
     logging.info("[INFO] Start opening import tracking file")
-    if os.path.isfile(IN_tracking_file):
-        logging.info("Tracking file <%s> loaded into panda dataframe.\n", IN_tracking_file)
-        return pd.read_csv(IN_tracking_file)
+    if os.path.isfile(in__tracking_file):
+        logging.info("Tracking file <%s> loaded into panda dataframe.\n", in__tracking_file)
+        return pd.read_csv(in__tracking_file)
     else:
-        logging.warning("Tracking file <%s> is missing. Creating a new panda dataframe.\n", IN_tracking_file)
+        logging.warning("Tracking file <%s> is missing. Creating a new panda dataframe.\n",
+                        in__tracking_file)
         columns = ["File Name", "File Path", "UUID", "File Extension", "Type of File", "Status"]
         return pd.DataFrame(columns=columns)
 
 
-def get_all_file_paths(directory_path):
+def get_all_file_paths(in__directory_path):
     """
     Retrieve a list of all file paths within a directory and its subdirectories.
 
     Parameters
     ----------
-    directory_path : str
+    in__directory_path : str
         The path to the directory for which file paths need to be collected.
 
     Returns
@@ -183,7 +180,7 @@ def get_all_file_paths(directory_path):
     """
     logging.info("[INFO] Recording all files from all pathes.")
     file_paths = []
-    for root, _, files in os.walk(directory_path):
+    for root, _, files in os.walk(in__directory_path):
         for file in files:
             file_path = os.path.join(root, file)
             file_paths.append(file_path)
@@ -192,7 +189,7 @@ def get_all_file_paths(directory_path):
     return file_paths
 
 
-def get_uuid5(IN_file):
+def get_uuid5(in__file):
     """
     Generate a UUID (Universally Unique Identifier) based on the given input file.
 
@@ -201,7 +198,7 @@ def get_uuid5(IN_file):
     UUIDs are generated using a namespace and a name.
 
     Parameters:
-    - IN_file (str): The input file name for which the UUID will be generated.
+    - in__file (str): The input file name for which the UUID will be generated.
 
     Returns:
     str: A unique UUID version 5 string based on the provided file name.
@@ -218,20 +215,21 @@ def get_uuid5(IN_file):
     - The function uses the DNS namespace for generating UUIDs, which ensures uniqueness.
 
     """
-    unique_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, IN_file))
+    unique_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, in__file))
     return unique_id
 
 
-def generate_import_list(in_source_directory: str) -> pd.DataFrame:
+def generate_import_list(in__source_directory: str) -> pd.DataFrame:
     """
     Generate a Pandas DataFrame of file information from files in the specified directory.
 
     This function traverses the specified directory and its subdirectories to collect information
     about files, such as file name, file path, UUID, file extension, file type, and an initial
-    status of "not processed" for each file. It returns a Pandas DataFrame containing this information.
+    status of "not processed" for each file. It returns a Pandas DataFrame containing 
+    this information.
 
     Parameters:
-    - in_source_directory (str): The path to the directory to scan for files.
+    - in__source_directory (str): The path to the directory to scan for files.
 
     Returns:
     pd.DataFrame: A Pandas DataFrame containing file information.
@@ -244,7 +242,8 @@ def generate_import_list(in_source_directory: str) -> pd.DataFrame:
     ```
 
     Notes:
-    - The function collects information about files found in the specified directory and its subdirectories.
+    - The function collects information about files found in the specified directory 
+      and its subdirectories.
     - It assigns an initial status of "not processed" to each file.
 
     """
@@ -255,13 +254,14 @@ def generate_import_list(in_source_directory: str) -> pd.DataFrame:
     logging.info("[INFO] Generating a Pandas DataFrame from files in the import directory.")
 
     # Traverse the specified directory and its subdirectories
-    for root, _, files in os.walk(in_source_directory):
+    for root, _, files in os.walk(in__source_directory):
         for file in files:
             file_path = os.path.join(root, file)  # Get the full file path
             file_name = os.path.basename(file_path)  # Extract the file name
             file_extension = os.path.splitext(file_name)[1]  # Extract the file extension
             file_uuid = get_uuid5(file_name)  # Generate a UUID for the file
-            file_type = type(file_path)  # Determine the type of file (not the correct way, consider using `magic` library)
+            file_type = type(file_path)  # Determine the type of file (not the correct way,
+                                         # consider using `magic` library)
             count += 1  # Increment the file count
 
             # Append file information as a dictionary to the list
@@ -275,7 +275,8 @@ def generate_import_list(in_source_directory: str) -> pd.DataFrame:
             })
 
     # Log the number of documents found and the next step
-    logging.info("%s documents found in the import directory. Next: Checking import status.\n", count)
+    logging.info("%s documents found in the import directory. Next: Checking import status.\n",
+                 count)
 
     # Create a Pandas DataFrame from the collected file information
     df_result = pd.DataFrame(file_info)
@@ -283,7 +284,7 @@ def generate_import_list(in_source_directory: str) -> pd.DataFrame:
     return df_result  # Return the DataFrame containing file information
 
 
-def merge_dataframes(IN_main_df, IN_tmp_df):
+def merge_dataframes(in__main_df, in__tmp_df):
     """
     Merge two DataFrames based on unique combinations of "File Path" and "UUID" columns.
 
@@ -312,18 +313,30 @@ def merge_dataframes(IN_main_df, IN_tmp_df):
     # Merge the DataFrames
     result_df = merge_dataframes(main_df, tmp_df)
 
-    # Resulting DataFrame will contain unique rows from main_df and tmp_df with appropriate "Status" values.
+    # Resulting DataFrame will contain unique rows from main_df and tmp_df with appropriate 
+    "Status" values.
     ```
     """
-    df1 = IN_main_df.copy()
-    df2 = IN_tmp_df
+    df1 = in__main_df.copy()
+    df2 = in__tmp_df
     logging.info("[INFO] Validating import status of found files in import directory.")
     # Identify rows with the same UUID but different File Path in df1
     duplicate_rows = df1[df1.duplicated(subset=['UUID'], keep=False)]
 
     # Filter DF2 for unique combinations of "File Path" and "UUID" not in DF1
-    unique_rows_df2 = df2[~df2.set_index(["File Path", "UUID"]).index.isin(df1.set_index(["File Path", "UUID"]).index)]
-    print(unique_rows_df2)
+    # Step 1: Set the index for df2
+    index_df2 = df2.set_index(["File Path", "UUID"])
+
+    # Step 2: Set the index for df1
+    index_df1 = df1.set_index(["File Path", "UUID"])
+
+    # Step 3: Check which index values in df2 are not in df1
+    unique_rows_mask = ~index_df2.index.isin(index_df1.index)
+
+    # Step 4: Use the mask to filter df2 and get unique rows
+    unique_rows_df2 = df2[unique_rows_mask]
+
+
     # Set the "Status" column for the filtered rows to "import"
     unique_rows_df2["Status"] = "import"
 
@@ -333,11 +346,12 @@ def merge_dataframes(IN_main_df, IN_tmp_df):
     # Concatenate DF1 and the filtered DF2
     combined_df = pd.concat([df1, unique_rows_df2], ignore_index=True)
 
-    logging.info("Pandas Dataframe updated with %s files, status set to 'to be imported' or 'duplicated'.\n", len(unique_rows_df2))
+    logging.info("Dataframe updated with %s files, status set: 'to be imported' or 'duplicated'.\n",
+                 len(unique_rows_df2))
     return combined_df
 
 
-def get_available_loader_types(loader_mapping):
+def get_available_loader_types(in__loader_mapping):
     """
     Get available loader types based on their extension from a loader mapping dictionary.
 
@@ -349,13 +363,13 @@ def get_available_loader_types(loader_mapping):
     """
     # available_loader_types = [ext.lstrip(".") for ext in loader_mapping.keys()]
     logging.info("[INFO] Generating & Updating list of available document loader.")
-    available_loader_types = list(loader_mapping.keys())
-    logging.info("Possible file.extensions for document loader analyzed and list of extensions generated\n")
+    available_loader_types = list(in__loader_mapping.keys())
+    logging.info("Possible document loader analyzed and list of extensions generated\n")
 
     return available_loader_types
 
 
-def split_doc_into_chunks(IN_document):
+def split_doc_into_chunks(in__document):
     """
     Split a document into chunks of text.
 
@@ -377,16 +391,16 @@ def split_doc_into_chunks(IN_document):
     ```
 
     Notes:
-    - This function uses the RecursiveCharacterTextSplitter to divide the document into smaller pieces.
+    - Function uses the RecursiveCharacterTextSplitter to divide the document into smaller pieces.
     - It returns a list of text chunks.
 
     """
     chunks = []  # Initialize an empty list to store text chunks
 
-    if len(IN_document) != 0:
+    if len(in__document) != 0:
         # Split the document into chunks
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        chunks = text_splitter.split_documents(IN_document)
+        chunks = text_splitter.split_documents(in__document)
     else:
         # Log an error if no document is provided for splitting
         logging.error("No document found for splitting.\n")
@@ -394,7 +408,7 @@ def split_doc_into_chunks(IN_document):
     return chunks  # Return the list of text chunks
 
 
-def process_document_list(IN_file_list, IN_valid_extensions):
+def process_document_list(in__file_list, in__valid_extensions):
     """
     Process each row of the DataFrame and update the 'Status' column accordingly.
 
@@ -414,7 +428,8 @@ def process_document_list(IN_file_list, IN_valid_extensions):
     Example:
     ```python
     # Process a DataFrame of documents and update their status
-    document_df = pd.DataFrame({'File Path': ['file1.pdf', 'file2.txt'], 'Status': ['import', 'import']})
+    document_df = pd.DataFrame({'File Path': ['file1.pdf', 'file2.txt'], 
+                  'Status': ['import', 'import']})
     valid_extensions = ['.pdf', '.txt']
     result_df, text_chunks = process_document_list(document_df, valid_extensions)
     ```
@@ -427,13 +442,13 @@ def process_document_list(IN_file_list, IN_valid_extensions):
     text_chunks = []  # Initialize an empty list to store text chunks
     total_chunks = []  # Initialize an empty list to store total text chunks
 
-    for index, row in IN_file_list.iterrows():
+    for index, row in in__file_list.iterrows():
         if row['Status'] == "import":
             file_path = row["File Path"]
             file_name = row["File Name"]
             file_extension = row["File Extension"]
 
-            if file_extension in IN_valid_extensions:
+            if file_extension in in__valid_extensions:
                 # Load the document
                 loader_class, loader_args = LOADER_MAPPING[file_extension]
                 loader = loader_class(file_path, **loader_args)
@@ -443,26 +458,27 @@ def process_document_list(IN_file_list, IN_valid_extensions):
                 # Split the document into text chunks
                 text_chunks = split_doc_into_chunks(document)
                 total_chunks = total_chunks + text_chunks
-                logging.info("Splitting of document <%s> done with <%s> chunks. So far in total %s chunks.", file_name, len(text_chunks), len(total_chunks))
+                logging.info("Split of document <%s> done w/ <%s> chunks. Running total %s chunks.",
+                             file_name, len(text_chunks), len(total_chunks))
 
                 # Perform processing steps here (e.g., load the file)
                 # After processing, update the 'Status' to 'imported'
-                IN_file_list.at[index, 'Status'] = 'imported'
+                in__file_list.at[index, 'Status'] = 'imported'
             else:
                 # Mark the document as 'no loader available' if the extension is not valid
-                IN_file_list.at[index, 'Status'] = 'no loader available'
+                in__file_list.at[index, 'Status'] = 'no loader available'
                 logging.error("No document loader found!")
 
-    return IN_file_list, text_chunks  # Return the updated DataFrame and the list of text chunks
+    return in__file_list, text_chunks  # Return the updated DataFrame and the list of text chunks
 
 
-def existence_vectorstore(IN_datastore_location: str) -> bool:
+def existence_vectorstore(in__datastore_location: str) -> bool:
     """
     Check if a vector store exists at the specified location.
 
-    This function checks if a vector store exists at the given directory location. A valid vector store
-    must contain the 'index' directory, 'chroma-collections.parquet', 'chroma-embeddings.parquet', and
-    at least three index files ('*.bin' or '*.pkl').
+    This function checks if a vector store exists at the given directory location. A valid 
+    vector store must contain the 'index' directory, 'chroma-collections.parquet', 
+    'chroma-embeddings.parquet', and at least three index files ('*.bin' or '*.pkl').
 
     Parameters:
     - IN_datastore_location (str): The path to the vector store directory to check.
@@ -486,31 +502,39 @@ def existence_vectorstore(IN_datastore_location: str) -> bool:
 
     """
     logging.info("[INFO] Checking if vector store exists.")
-    
+
     # Check if the 'index' directory exists
-    if os.path.exists(os.path.join(IN_datastore_location, 'index')):
+    if os.path.exists(os.path.join(in__datastore_location, 'index')):
         # Check if 'chroma-collections.parquet' and 'chroma-embeddings.parquet' exist
-        if os.path.exists(os.path.join(IN_datastore_location, 'chroma-collections.parquet')) and os.path.exists(os.path.join(IN_datastore_location, 'chroma-embeddings.parquet')):
+        # Step 1: Create the file paths
+        collections_file_path = os.path.join(in__datastore_location, 'chroma-collections.parquet')
+        embeddings_file_path = os.path.join(in__datastore_location, 'chroma-embeddings.parquet')
+
+        # Step 2: Check if both files exist
+        if os.path.exists(collections_file_path) and os.path.exists(embeddings_file_path):
             # List index files ('*.bin' and '*.pkl')
-            list_index_files = os.path.join(IN_datastore_location, 'index/*.bin')
-            list_index_files += os.path.join(IN_datastore_location, 'index/*.pkl')
-            
+            list_index_files = os.path.join(in__datastore_location, 'index/*.bin')
+            list_index_files += os.path.join(in__datastore_location, 'index/*.pkl')
+
             # Check if there are at least three index files
             if len(list_index_files) > 3:
-                logging.info("Vector store exists at %s.\n", IN_datastore_location)
+                logging.info("Vector store exists at %s.\n", in__datastore_location)
                 return True
 
     # If the vector store doesn't meet the criteria, log a warning and return False
-    logging.warning("Vector store does not exist or is incomplete at %s.\n", IN_datastore_location)
+    logging.warning("Vector store does not exist or is incomplete at %s.\n", in__datastore_location)
     return False
 
 
-def update_vectorstore(IN_datastore_location: str, IN_embedding_function, IN_chromadb_setting, IN_text_chunks):
+def update_vectorstore(in__datastore_location: str,
+                       in__embedding_function,
+                       in__chromadb_setting,
+                       in__text_chunks):
     """
     Update a vector store with new text chunks.
 
-    This function updates an existing vector store or creates a new one if it doesn't exist. It loads the vector
-    store, adds the provided text chunks, and saves the updated vector store.
+    This function updates an existing vector store or creates a new one if it doesn't exist. 
+    It loads the vector store, adds the provided text chunks, and saves the updated vector store.
 
     Parameters:
     - IN_datastore_location (str): The path to the vector store directory.
@@ -534,35 +558,38 @@ def update_vectorstore(IN_datastore_location: str, IN_embedding_function, IN_chr
     Notes:
     - This function first checks if a vector store exists at the specified location using the
       `existence_vectorstore` function.
-    - If a vector store exists, it loads the store, adds the text chunks, and saves the updated store.
+    - If a vector store exists, it loads the store, adds text chunks, and saves the updated store.
     - If no vector store exists, it creates a new vector store, adds the text chunks, and saves it.
 
     """
-    if existence_vectorstore(IN_datastore_location=IN_datastore_location) is True:
+    if existence_vectorstore(in__datastore_location=in__datastore_location) is True:
 
         # Loading the existing vector store
         vectordb = Chroma(
-            persist_directory=IN_datastore_location,
-            embedding_function=IN_embedding_function,
-            client_settings=IN_chromadb_setting
+            persist_directory=in__datastore_location,
+            embedding_function=in__embedding_function,
+            client_settings=in__chromadb_setting
         )
-        logging.info("Vector store loaded from location <%s>", IN_datastore_location)
+        logging.info("Vector store loaded from location <%s>", in__datastore_location)
 
         # Adding the provided text chunks to the vector store
-        vectordb.add_documents(IN_text_chunks)
-        logging.info("A total of %s file chunks were imported into the vector store.\n", len(IN_text_chunks))
+        vectordb.add_documents(in__text_chunks)
+        logging.info("A total of %s file chunks were imported into the vector store.\n",
+                     len(in__text_chunks))
 
     else:
-        logging.error("No vector store exists. Creating a new store in <%s>.", IN_datastore_location)
+        logging.error("No vector store exists. Creating a new store in <%s>.",
+                      in__datastore_location)
 
         # Creating a new vector store and adding the text chunks
         vectordb = Chroma.from_documents(
-            documents=IN_text_chunks,
-            embedding=IN_embedding_function,
-            persist_directory=IN_datastore_location,
-            client_settings=IN_chromadb_setting
+            documents=in__text_chunks,
+            embedding=in__embedding_function,
+            persist_directory=in__datastore_location,
+            client_settings=in__chromadb_setting
         )
-        logging.info("A total of %s file chunks were imported into the vector store.\n", len(IN_text_chunks))
+        logging.info("A total of %s file chunks were imported into the vector store.\n",
+                     len(in__text_chunks))
 
     # Saving the updated vector store (currently commented out)
     # vectordb.persist()
@@ -603,34 +630,32 @@ def main_execution():
     """
     # Open a Pandas DataFrame with a list of already loaded documents.
     # If it doesn't exist, establish a new DataFrame.
-    import_tracking_df = open_import_tracking(IN_tracking_file=IMPORT_LOG_FILE)
+    import_tracking_df = open_import_tracking(in__tracking_file=IMPORT_LOG_FILE)
 
     # Generate a list of all documents in the import directory.
-    tmp_import_df = generate_import_list(in_source_directory=DOC2SCAN_DATA_DIR)
+    tmp_import_df = generate_import_list(in__source_directory=DOC2SCAN_DATA_DIR)
 
     # Match both DataFrames and mark documents to be imported with "import" or "duplicate."
     document_list_df = merge_dataframes(import_tracking_df, tmp_import_df)
 
     # Generate the list of possible extensions from the document loader.
-    valid_extension = get_available_loader_types(loader_mapping=LOADER_MAPPING)
+    valid_extension = get_available_loader_types(in__loader_mapping=LOADER_MAPPING)
 
     # Process the document list and import/flag the documents.
     document_list_df, text_chunks = process_document_list(
-        IN_file_list=document_list_df,
-        IN_valid_extensions=valid_extension
+        in__file_list=document_list_df,
+        in__valid_extensions=valid_extension
     )
 
-    print(len(text_chunks))
-
     # Initializing the vector store using OpenAI embeddings.
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings()             # type: ignore
 
     # Update the vector store with the imported text chunks.
     update_vectorstore(
-        IN_datastore_location=PROCESSED_DATA_DIR,
-        IN_embedding_function=embeddings,
-        IN_chromadb_setting=CHROMA_SETTINGS,
-        IN_text_chunks=text_chunks
+        in__datastore_location=PROCESSED_DATA_DIR,
+        in__embedding_function=embeddings,
+        in__chromadb_setting=CHROMA_SETTINGS,
+        in__text_chunks=text_chunks
     )
 
     # Save the document import list to a CSV file.
