@@ -31,6 +31,7 @@ from langchain.vectorstores import Chroma  # Vector storage for langchain
 from langchain.embeddings import OpenAIEmbeddings  # Embeddings for langchain
 from langchain.text_splitter import RecursiveCharacterTextSplitter  # Text splitting for langchain
 
+
 #pylint: disable=W0611, W0404
 from langchain.document_loaders import (
     CSVLoader,  # Handles loading text from CSV files.
@@ -47,31 +48,40 @@ from langchain.document_loaders import (
 )
 
 from chromadb.config import Settings # Importing a specific configuration settings modul
+
+# [IMPORTS of environment constants]
+load_dotenv()   # load environmental variables
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+
+ROOT_DIR = os.path.join(str(os.getenv("ROOT_DIR")))
+# // TODO - using function from utilities_braingpt, automatize identification of root-directory
+
+BRAINGPT_INQUIRY_FILE = os.path.join(ROOT_DIR, str(os.getenv("LOG_DIR")),
+                                     str(os.getenv("INGEST_LOG_NAME")))
+
 
 # [LOGGING settings]
 logging.basicConfig(level = logging.INFO,
                     format = "%(asctime)s : %(levelname)s : Line No. : %(lineno)d - %(message)s",
-                    filename = 'braingpt.log',
+                    filename = BRAINGPT_INQUIRY_FILE,
                     filemode = 'a')
 logging.info("Start of script execution")
 
 
-# [IMPORTS of environment constants]
-load_dotenv()   # load environmental variables
-ROOT_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT"
-# // TODO - using function from utilities_braingpt, automatize identification of root-directory
 
-
-PROCESSED_DATA_DIR = os.path.join(ROOT_DIR, str(os.getenv("PROCESSED_DATA_DIR")))
-logging.info("Log file on imported documents: %s", PROCESSED_DATA_DIR)
+PROCESSED_DATA_DIR = os.path.join(ROOT_DIR, 
+                                  str(os.getenv("PROCESSED_DATA_DIR")),
+                                  str(os.getenv("CHROMA_DB")))
+logging.info("Target directory for processed files: %s", PROCESSED_DATA_DIR)
 
 IMPORT_LOG_FILE = os.path.join(ROOT_DIR, str(os.getenv("LOG_DIR")),
                                str(os.getenv("IMPORT_LOG_NAME")))
-logging.info("Log file on imported documents: %s",IMPORT_LOG_FILE)
+logging.info("Log file on imported documents: %s", IMPORT_LOG_FILE)
 
 DOC2SCAN_DATA_DIR = os.path.join(ROOT_DIR, str(os.getenv("DOC2SCAN_DATA_DIR")))
-logging.info("Source directory for documents: %s\n",DOC2SCAN_DATA_DIR)
+logging.info("Source directory for documents: %s\n", DOC2SCAN_DATA_DIR)
 
 
 # [CONSTANTS definition]
@@ -98,8 +108,6 @@ LOADER_MAPPING = {
     ".txt": (TextLoader, {"encoding": "utf8"}),
     # Add more mappings for other file extensions and loaders as needed
 }
-
-DOC2SCAN_DATA_DIR = "/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw"
 
 
 # [CLASS definition]
@@ -596,6 +604,106 @@ def update_vectorstore(in__datastore_location: str,
     vectordb = None
 
 
+def update_vectorstore_collection(in__datastore_location: str, 
+                                  in__embedding_function, 
+                                  in__chromadb_setting, 
+                                  in__text_chunks, 
+                                  group_by_attribute="collection"):
+    """
+    Update a vector store with new text chunks grouped into collections.
+
+    This function updates an existing vector store or creates a new one if it doesn't exist.
+    It loads the vector store, groups the provided text chunks into collections based on a
+    specified attribute, and adds the collections to the vector store.
+
+    Parameters:
+    - IN_datastore_location (str): The path to the vector store directory.
+    - IN_embedding_function (callable): The embedding function to use for text chunks.
+    - IN_chromadb_setting (Settings): The ChromaDB settings for the vector store.
+    - IN_text_chunks (list of dict): A list of text chunks and their associated attributes.
+    - group_by_attribute (str): The attribute by which to group the documents into collections.
+
+    Returns:
+    None
+
+    Example:
+    ```python
+    # Define vector store settings and update the vector store with grouped collections
+    datastore_location = "/path/to/vectorstore"
+    embedding_func = my_embedding_function
+    chromadb_settings = Settings(chroma_db_impl='duckdb+parquet')
+    text_chunks = [
+        {"text": "chunk1", "collection": "collection1"},
+        {"text": "chunk2", "collection": "collection1"},
+        {"text": "chunk3", "collection": "collection2"}
+    ]
+    update_vectorstore(datastore_location, embedding_func, chromadb_settings, text_chunks)
+    ```
+
+    Notes:
+    - This function groups the text chunks into collections based on the specified `group_by_attribute`.
+    - It then adds the collections to the vector store instead of individual documents.
+    """
+    if existence_vectorstore(in__datastore_location=in__datastore_location) is True:
+        # Loading the existing vector store
+        vectordb = Chroma(
+            persist_directory=in__datastore_location,
+            embedding_function=in__embedding_function,
+            client_settings=in__chromadb_setting
+        )
+        logging.info("Vector store loaded from location <%s>", in__datastore_location)
+
+        # Group text chunks into collections based on the specified attribute
+        collections = {}
+        for chunk in in__text_chunks:
+            attribute_value = chunk.get(group_by_attribute, "default")
+            if attribute_value not in collections:
+                collections[attribute_value] = []
+            collections[attribute_value].append(chunk["text"])
+
+        # Add collections to the vector store
+        for collection_name, collection_text_chunks in collections.items():
+            # Create a single document from the chunks in the collection
+            collection_text = "\n".join(collection_text_chunks)
+
+            # Add the collection to the vector store
+            vectordb.add_documents([collection_text], attribute_name=group_by_attribute, attribute_value=collection_name)
+            logging.info("Collection '%s' with %s text chunks imported into the vector store.\n",
+                         collection_name, len(collection_text_chunks))
+
+    else:
+        logging.error("No vector store exists. Creating a new store in <%s>.",
+                      in__datastore_location)
+
+        # Creating a new vector store and adding collections
+        vectordb = Chroma(
+            persist_directory=in__datastore_location,
+            embedding_function=in__embedding_function,
+            client_settings=in__chromadb_setting
+        )
+
+        # Group text chunks into collections based on the specified attribute
+        collections = {}
+        for chunk in in__text_chunks:
+            attribute_value = chunk.get(group_by_attribute, "default")
+            if attribute_value not in collections:
+                collections[attribute_value] = []
+            collections[attribute_value].append(chunk["text"])
+
+        # Add collections to the vector store
+        for collection_name, collection_text_chunks in collections.items():
+            # Create a single document from the chunks in the collection
+            collection_text = "\n".join(collection_text_chunks)
+            # Add the collection to the vector store
+            vectordb.add_documents(collection_text, attribute_name=group_by_attribute, attribute_value=collection_name)
+            logging.info("Collection '%s' with %s text chunks imported into the vector store.\n",
+                         collection_name, len(collection_text_chunks))
+
+    # Saving the updated vector store (currently commented out)
+    # vectordb.persist()
+    vectordb = None
+
+
 def main_execution():
     """
     Main execution function for importing and processing documents.
@@ -634,6 +742,10 @@ def main_execution():
 
     # Generate a list of all documents in the import directory.
     tmp_import_df = generate_import_list(in__source_directory=DOC2SCAN_DATA_DIR)
+
+    if len(tmp_import_df) == 0:
+        logging.info("No documents found in the import directory. Exiting.\n")
+        return
 
     # Match both DataFrames and mark documents to be imported with "import" or "duplicate."
     document_list_df = merge_dataframes(import_tracking_df, tmp_import_df)
