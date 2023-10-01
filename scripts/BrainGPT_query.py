@@ -8,9 +8,9 @@ Query our own data
 
 """
 
-# TODO: Consider moving to local processing for better efficiency. Check the LinkedIn article and Obsidian notes for details.
-# TODO: Implement an empty form at the beginning for user input.
-# FIXME: Address the issue of an empty historic chat at the beginning.
+# // TODO: Consider moving to local processing for better efficiency. Check the LinkedIn article and Obsidian notes for details.
+# // TODO: Implement an empty form at the beginning for user input.
+# // FIXME: Address the issue of an empty historic chat at the beginning.
 
 # [IMPORTS of modules and packages]
 
@@ -30,6 +30,9 @@ import openai  # OpenAI library for working with OpenAI's GPT-3 or other models
 
 from flask import Flask
 
+#pylint: disable=E0401
+from brain_gpt_config import config_braingpt # type: ignore
+
 # from braingpt_src.routes import *
 
 # from chromadb.config import Settings # Importing a specific configuration settings module
@@ -47,16 +50,13 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 ROOT_DIR = os.path.join(str(os.getenv("ROOT_DIR")))
 
 # Define the path to the query log file
-BRAINGPT_INQUIRY_FILE = os.path.join(ROOT_DIR, str(os.getenv("LOG_DIR")),
-                                     str(os.getenv("QUERY_LOG_NAME")))
+BRAINGPT_INQUIRY_LOG_FILE = os.path.join(ROOT_DIR, str(os.getenv("LOG_DIR")),
+                                         str(os.getenv("QUERY_LOG_NAME")))
 
 # [LOGGING settings]
 
-# Configure logging settings
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s : %(levelname)s : Line No. : %(lineno)d - %(message)s",
-                    filename=BRAINGPT_INQUIRY_FILE,
-                    filemode='a')
+# [LOGGING settings]
+config_braingpt.setup_logging(in__log_path_file= BRAINGPT_INQUIRY_LOG_FILE)
 logging.info("Start of script execution: %s", os.path.basename(__file__))
 
 # Define if local testing is done (without inquiring OpenAI)
@@ -74,5 +74,4 @@ if __name__ == "__main__":
     app.run(host="127.0.0.1",  # type: ignore
             port=4455,
             debug=True)
-
     
