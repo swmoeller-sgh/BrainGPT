@@ -1,0 +1,98 @@
+
+/* Style to set the fixed width */
+
+/* Some classes */
+.result_box {
+    border: 2px solid rgb(187, 222, 235);
+    max-height: 10vh;
+    width: 36%;
+    overflow: auto;
+    margin: 1%;
+    padding: 4px
+  }
+
+.block_text {
+    max-height: 10vh;
+    width: 36%;
+    overflow: auto;
+    margin-top: 1%;
+    margin-bottom: 2%;
+    padding: 4px
+  }
+
+
+/* general formating */
+body {
+    background-color: rgb(117, 190, 218); 
+/*  to avoid using a statis path name, the path to image is generate in Jinja template and pushed to CSS  */
+    background-image: var(--background-url);
+    background-position-x: right;
+    background-size: 60% auto; background-repeat: no-repeat;    
+
+
+    min-height: 100vh; 
+    margin:0;
+
+    display:flex; 
+    flex-direction:column; 
+
+}
+
+
+footer{ 
+    min-height:30px; 
+    padding: 0.5vh;
+
+}
+
+main {
+    font-family: Arial, sans-serif;
+    margin-left: 0;
+    padding: 1vh;
+    flex:1; 
+    }
+
+header{
+    min-height:50px; 
+    margin: 0;
+    font-family: Arial, sans-serif;
+    font-size: 8vh;
+    text-align: center;
+    padding: 2px;
+    letter-spacing: 5px;
+    text-shadow: 2px 2px red;
+
+/*    background-color: rgb(194, 223, 232);
+    height:4vh;
+    border-width: 2px;
+    border-bottom-style: dotted; */
+}
+
+/* Different IDs can be used to apply the style */
+    #nav {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 10px;
+    }
+    #left {
+        float: left;
+        width: 10%;
+        padding: 10px;
+        border-right: 1px solid #ccc;
+    }
+    #right {
+        float: right;
+        width: 40%;
+        padding: 10px;
+    }
+    #question-section {
+        clear: both;
+        padding: 10px;
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
