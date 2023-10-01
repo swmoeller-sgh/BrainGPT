@@ -1,4 +1,2 @@
 File Name,File Path,UUID,File Extension,Type of File,Status
-Bosch_Washing_Machine.pdf,/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw/Bosch_Washing_Machine.pdf,ce441402-7086-537a-8581-992f84bb724e,.pdf,<class 'str'>,imported
-state_of_the_union.txt,/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw/state_of_the_union.txt,41c6a583-b8d1-59e0-bbb0-19785c7bd3c0,.txt,<class 'str'>,imported
-Regulierung_von_Large_Language_Models_in_DSA_und_AIA-E_-_beck-online.pdf,/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw/Regulierung_von_Large_Language_Models_in_DSA_und_AIA-E_-_beck-online.pdf,0ccce236-7f17-5320-83e5-f8c908081b6d,.pdf,<class 'str'>,imported
+state_of_the_union.txt,/Users/swmoeller/python/2023/large_language_model/BrainGPT/data/10_raw/doc2scan/state_of_the_union.txt,41c6a583-b8d1-59e0-bbb0-19785c7bd3c0,.txt,<class 'str'>,imported
