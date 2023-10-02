@@ -49,7 +49,7 @@ logging.info("DEBUG mode: %s", DEBUG_MODE)
 # [CONFIGURATION of flask-application]
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
-from routes import *    # routes to pages #pylint: disable=E0401, C0411, C0413, W0401
+from routes import *    # routes to pages #pylint: disable=E0401, C0411, C0413, W0401, W0614
 
 
 # [MAIN part]
