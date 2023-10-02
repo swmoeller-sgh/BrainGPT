@@ -8,7 +8,7 @@ from langchain.llms import OpenAI
 
 # import own packages
 from brain_app import app
-from gpt_tools import generate_answer
+from braingpt_src import generate_answer
 
 # Define, if local testing is done (i.e. without inquiring OpenAI)
 DEBUG_MODE = os.getenv("DEBUG", "False") == "True"
