@@ -6,3 +6,4 @@ tree_structure.md
 /models/99_backup
 /tests
 /logs
+__pycache__

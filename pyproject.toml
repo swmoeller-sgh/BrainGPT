@@ -37,17 +37,12 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
 ]
 dependencies = [
-    "pandas>=2.0.3",
-    "numpy>=1.25.1",
-    "matplotlib>=3.7.2",
-    "tk>=0.1.0",
-    "statsmodels>=0.14.0",
-    "scipy>=1.9.3",
+ 
     #    "helper-collection @ file:///Users/swmoeller/python/05_packages/built_packages/helper_collection-1.0.0-py3-none-any.whl",
-    "mysql-connector-python>=8.1.0",
+
 ]   
 
-package-dir = "src"
+package-dir = "/src"
 license = {text = "MIT"}
 
 [project.urls]
