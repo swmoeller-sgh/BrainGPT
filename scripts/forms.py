@@ -12,6 +12,8 @@ class RaiseQuestionForm(FlaskForm):
     FlaskForm : flask form
         Import of Flaskform class
     """
-    question = StringField("question",render_kw={'style': "width: 50ch; height: 5ch"}, validators = [DataRequired()])
+    question = StringField("question",
+                           render_kw={'style': "width: 50ch; height: 5ch"},
+                           validators = [DataRequired()])
     submit = SubmitField("Submit question")
     new = BooleanField("Continue conversation")

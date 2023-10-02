@@ -22,7 +22,7 @@ import openai  # OpenAI library for working with OpenAI's GPT-3 or other models
 
 from flask import Flask
 
-from brain_gpt_config import config_braingpt #pylint: disable=E0401
+from braingpt_config import config_braingpt #pylint: disable=E0401
 
 
 # [INITIALIZE environment]
@@ -42,7 +42,7 @@ BRAINGPT_INQUIRY_LOG_FILE = os.path.join(ROOT_DIR,  # Define the path to the que
 config_braingpt.setup_logging(in__log_path_file= BRAINGPT_INQUIRY_LOG_FILE)
 logging.info("Start of script execution: %s", os.path.basename(__file__))
 
-# [TESTING definition, i.e. local testing without inquiring OpenAI]
+# [TESTING retrival from environment, i.e. local testing without inquiring OpenAI]
 DEBUG_MODE = os.getenv("DEBUG", "False") == "True"
 logging.info("DEBUG mode: %s", DEBUG_MODE)
 

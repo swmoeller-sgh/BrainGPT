@@ -50,7 +50,7 @@ from langchain.document_loaders import (
 from chromadb.config import Settings # Importing a specific configuration settings modul
 
 #pylint: disable=E0401
-from brain_gpt_config import config_braingpt # type: ignore
+from braingpt_config import config_braingpt # type: ignore
 
 # [INITIALIZE environment]
 env_file = find_dotenv(".env")
@@ -122,9 +122,6 @@ LOADER_MAPPING = {
 
 
 # [FUNCTION definition]
-
-# helper functions
-
 def open_import_tracking(in__tracking_file: str) -> pd.DataFrame:
     """
     Check if the import tracking data file with a list of imported files and their UUIDs exists.

@@ -10,7 +10,8 @@ Purpose
 
 3. Debugging and Testing: The script includes debugging features controlled by 
    the `DEBUG_MODE` variable, allowing developers to test the application with pre-configured 
-   answers when debugging is enabled. It also maintains a historic chat log of user questions and answers for reference.
+   answers when debugging is enabled. It also maintains a historic chat log of user questions 
+   and answers for reference.
 
 """
 # [IMPORTS of modules and packages]
@@ -18,25 +19,22 @@ Purpose
 import os
 import logging
 
-import forms
+import forms    #pylint: disable=E0401
 
 from flask import render_template
 from langchain.llms import OpenAI
 
 
 # Import own packages
-#pylint: disable=E0401
-from brain_gpt_config import config_braingpt
-from braingpt_src import generate_answer
-
 from braingpt_query import app
+from braingpt_config import config_braingpt    #pylint: disable=E0401
+from braingpt_src import generate_answer        #pylint: disable=E0401
+
 
 # [DIRECTORY setup]
-# Define the root directory for file operations
-ROOT_DIR = os.path.join(str(os.getenv("ROOT_DIR")))
-
-# Define the path to the query log file
-BRAINGPT_INQUIRY_LOG_FILE = os.path.join(ROOT_DIR, str(os.getenv("LOG_DIR")),
+ROOT_DIR = os.path.join(str(os.getenv("ROOT_DIR"))) # Define the root directory for file operations
+BRAINGPT_INQUIRY_LOG_FILE = os.path.join(ROOT_DIR,  # Define the path to the query log file
+                                         str(os.getenv("LOG_DIR")),
                                          str(os.getenv("QUERY_LOG_NAME")))
 
 # [LOGGING settings]
@@ -44,28 +42,31 @@ config_braingpt.setup_logging(in__log_path_file= BRAINGPT_INQUIRY_LOG_FILE)
 logging.info("Start of script execution: %s", os.path.basename(__file__))
 
 
-# Define if local testing is done (i.e. without inquiring OpenAI)
+# [TESTING retrival from environment, i.e. local testing without inquiring OpenAI]
 DEBUG_MODE = os.getenv("DEBUG", "False") == "True"
-print("DEBUG status:", DEBUG_MODE)
+logging.info("DEBUG status: %s", DEBUG_MODE)
 
-# Create LLM instances
-llm_std = OpenAI()  # Standard OpenAI instance # type: ignore
-llm_temp0 = OpenAI(temperature=0)  # OpenAI instance with temperature set to 0 # type: ignore
+# [LLM INSTANCES creation]
+llm_std = OpenAI()                  # Standard OpenAI instance # type: ignore
+llm_temp0 = OpenAI(temperature=0)   # OpenAI instance with temperature set to 0 # type: ignore
 
+# [CONSTANTS definition]
 # Define the local testing debug_answer
 debug_answer = {
     "question": "What is VSM?",
     "result": {
-        "answer": "VSM stands for Value Stream Mapping. It is a process used to visually document and analyze the steps in a process to identify areas for improvement.",
+        "answer": "VSM stands for Value Stream Mapping. It is a process used to visually document" 
+        "and analyze the steps in a process to identify areas for improvement.",
         "source_documents": "Stefans own Source"
     }
 }
 
-# Store historic communication
-historic_communication = []
 
-# Define get_answer function
-def get_answer(in__question, in__chat_history=[]):
+historic_communication = []             # Store historic communication
+
+# [FUNCTION definition]
+def get_answer(in__question,            # Define get_answer function        #pylint: disable=W0102
+               in__chat_history=[]):
     """
     Inquire the vector database on the question
 
@@ -86,10 +87,9 @@ def get_answer(in__question, in__chat_history=[]):
 
 
 
-# Definition of ROUTINGs
-# Define the index route "/"
-@app.route("/", methods=["GET", "POST"])
-def index(in__debug_answer=debug_answer,
+# [ROUTING definition]
+@app.route("/", methods=["GET", "POST"])        # Define the index route "/"
+def index(in__debug_answer=debug_answer,        # INDEX route               #pylint: disable=W0102
           in__debug_mode=DEBUG_MODE,
           in__historic_communication=historic_communication):
     """
@@ -100,6 +100,7 @@ def index(in__debug_answer=debug_answer,
     html generated from template
         Updated index page (from jinja template)
     """
+    logging.info("index-page called")
     form = forms.RaiseQuestionForm()
 
     if form.validate_on_submit() is True:
@@ -109,15 +110,13 @@ def index(in__debug_answer=debug_answer,
             in__historic_communication = []
 
         question = form.question.data
-
-        print("global variable:", DEBUG_MODE)
         if in__debug_mode is True:
-            print("DEBUG mode activated, pre-configured answers only!")
+            logging.info("DEBUG mode activated, pre-configured answers only!\n")
             answer = in__debug_answer
 
         else:
-            print("DEBUG mode deactivated!")
-            # FIXME: Reference documents not shown
+            logging.info("DEBUG mode deactivated!\n")
+            # // FIXME: Reference documents not shown
             answer = get_answer(question, in__chat_history=in__historic_communication)
 
         update_historic_chat = (question, answer["result"]["answer"])
