@@ -7,7 +7,6 @@ Query our own data
 ============
 
 """
-
 # // TODO: Move to local processing for better efficiency (see LinkedIn article and Obsidian notes).
 # // TODO: Implement an empty form at the beginning for user input.
 # // FIXME: Address the issue of an empty historic chat at the beginning.
