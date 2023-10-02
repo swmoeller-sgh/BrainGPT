@@ -26,7 +26,7 @@ from langchain.llms import OpenAI
 
 
 # Import own packages
-from braingpt_query import app
+from braingpt_app import app
 from braingpt_config import config_braingpt    #pylint: disable=E0401
 from braingpt_src import generate_answer        #pylint: disable=E0401
 
