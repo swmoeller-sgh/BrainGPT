@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root {
+            --background-url: url('{{ url_for('static', filename='brain_floating_two_hands.png') }}');
+        }
+    </style>
+    <title>{% block title %}BrainGPT{% endblock %}</title>
+</head>
+
+
+<body style="margin: 0;">  {# removes the white margin on left and top side in browser view #}
+    <div class="grid_container">
+        <header class="item_header">BrainGPT</header>
+
+        <nav class="item_navigation"></nav>
+        
+        <div class="item_empty_space">
+            {% block empty_space %}
+            {% endblock empty_space %}
+        </div>
+        
+        <section class="item_introduction">
+            {% block introduction %}
+            <p>No content found</p>
+            {% endblock %}
+        </section>
+
+        <div class="item_questiongrid">
+            {% block questiongrid %}
+                <div class="item_question">
+                    {% block question %}
+                        <p>No content found</p>
+                    {% endblock %}
+                </div>
+                <div class="item_questionnavigation">
+                    {% block questionnavigation %}
+                        <p>No content found</p>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+        
+        <main class="item_content">
+            {# Content of page #}
+            {% block content %}
+            <p>No content found</p>
+            {% endblock %}
+        </main>
+        
+        <section class="item_history">
+            {# Content of page #}
+            {% block history %}
+            <p>No content found</p>
+            {% endblock %}
+        </section>
+        
+        <footer class="item_footer">
+            &copy; Copyright (code & design) 2023 by Stefan W. Moeller. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>

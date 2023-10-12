@@ -1,0 +1,51 @@
+
+
+{% block title %} Homepage BrainGPT {% endblock %}
+
+
+{% block introduction %}
+	<strong>Background<br></strong>
+	BrainGPT leverages our proprietary knowledge base to answer questions, providing sources for 
+	reference to identify potential inaccuracies. Questions can be generic or specific to 
+	knowledge collections. In a secondary phase, it may turn to OpenAI ChatGPT for 
+	further assistance.
+{% endblock %}
+
+<form method="post">
+	{% block question %}
+		{# token protects against malicious requests #}
+		{#{{ form.csrf_token() }} #}
+		<label for="question">Question</label>
+		<input type="text" name="question"
+               placeholder="Your question here"
+			   width= "100px"
+               value="{{ request.form['question'] }}">
+        </input>
+	{% endblock %}
+	{% block questionnavigation %}
+		<button type="submit">Submit</button>
+{#}		{{ form.new_conv }} #}
+	{% endblock %}
+</form>
+
+{% block content %}
+	{% if question %}
+    	<h3>Your last question:</h3>
+		{{ question }}
+    {% endif %}
+    {% if answer %}
+		<div class="item_result_box">
+			{{ answer.result.answer }}
+			<div class="italic-text">
+				Sources: {{ answer.result.source_documents }}
+			</div>
+		</div>
+    {% endif %}
+{% endblock %}
+
+{% block history %}
+<h3>Your past conversation on this topic</h3>
+<div class="item_history_box">
+	{{ historic_chat }}
+</div>
+{% endblock %}

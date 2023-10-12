@@ -22,6 +22,11 @@ import openai  # OpenAI library for working with OpenAI's GPT-3 or other models
 from flask import Flask
 
 from braingpt_config import config_braingpt #pylint: disable=E0401
+import routes
+
+from flask_wtf.csrf import CSRFProtect
+from flask import Flask, render_template, request, url_for, flash, redirect
+
 
 
 # [INITIALIZE environment]
@@ -48,6 +53,7 @@ logging.info("DEBUG mode: %s", DEBUG_MODE)
 # [CONFIGURATION of flask-application]
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
+# csrf = CSRFProtect(app)
 from routes import *    # routes to pages #pylint: disable=E0401, C0411, C0413, W0401, W0614
 
 

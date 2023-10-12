@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{# base template #}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_base.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_grid_base.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_grid_question.css') }}">
+
+    <style>
+        :root {
+            --background-url: url('{{ url_for('static', filename='brain_floating_two_hands.png') }}');
+        }
+    </style>
+    <title>{% block title %}BrainGPT{% endblock %}</title>
+</head>
+
+
+<body style="margin: 0;">  {# removes the white margin on left and top side in browser view #}
+    <div class="grid_container">
+        <header class="item_header">
+            {% block header %}            
+                <p>No content found</p>
+            {% endblock header %}            
+        </header>
+
+        <nav class="item_navigation">
+            {% block navigation %}            
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('question') }}">Raise question</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            {% endblock navigation %}            
+        </nav>
+        
+        <section class="item_content01">
+            {% block content01 %}            
+                <p>No content found</p>
+            {% endblock content01 %}            
+        </section>
+
+        <section class="item_content02">
+            {% block content02 %}            
+                <p>No content found</p>
+            {% endblock content02 %}            
+        </section>
+        
+        <section class="item_infobox">
+            {% block info_box %}
+                <p>No content found</p>
+            {% endblock info_box %}
+        </section>
+        
+        <footer class="item_footer">
+            {% block footer %}
+                <p>No content found</p>
+            {% endblock footer %}
+        </footer>
+    </div>
+</body>
+</html>

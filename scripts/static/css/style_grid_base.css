@@ -1,0 +1,140 @@
+.grid_container {
+  display: grid;
+
+  height: 100vh;    /* Set the height of the grid to fill the viewport */
+  width: 100vw;     /* Set the width of the grid to fill the viewport */
+  
+  grid-template-columns: 1fr 3fr 50%; /* Three columns: Navigation, Content area 01, Content area 02 */
+  grid-template-rows: 10% 77% 10% 3%;
+  
+  grid-template-areas:
+    "header header header"
+    "navigation content01 content02"
+    "navigation info_box info_box"
+    "footer footer footer";
+
+  gap: 0px 0px;   
+  grid-column-gap: 0px;
+  margin: 0;
+  padding: 0;
+
+  background-color: rgb(117, 190, 218); 
+}
+
+  .item_header {
+    grid-area: header;
+    margin: 0;
+    text-align: center;
+
+    font-family: Arial, Helvetica, sans-serif;
+    color: whitesmoke;
+    font-size: 4vh;
+    
+    padding-left: 5px;
+    letter-spacing: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgb(47, 51, 54); 
+}
+    
+  .item_content01 {
+      grid-area: content01;
+/*      overflow: auto; */
+
+      padding: 4px;
+      padding-left: 20px;
+
+      font-size: 3vh;
+      line-height: 1.2;
+
+/*      background-color: rgb(229, 31, 71); */
+  }
+
+  .item_content02 {
+    grid-area: content02;
+
+    padding: 4px;
+    padding-left: 20px;
+
+    font-size: 3vh;
+    line-height: 1.2;
+
+    background-image: var(--background-url);
+    background-position-x: center;
+    background-size: 100% auto; background-repeat: no-repeat; 
+
+/*    background-color: rgb(84, 204, 14); */
+}
+
+
+  .item_navigation { 
+    grid-area: navigation; 
+    
+    list-style-type: circle;
+
+    line-height: 1.5;
+
+    font-size: 2.5vh;
+    color: whitesmoke;
+
+    a:link {
+      color: whitesmoke;
+      text-decoration: none; 
+    }
+
+    a:visited {
+      color: whitesmoke;
+      text-decoration: none; 
+    }
+
+    a:hover {
+      color: hotpink;
+    }
+
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+
+
+    background-color: rgb(73, 86, 96); 
+
+/*    background-color:  rgb(99, 161, 186); */
+  }
+
+  .item_infobox { 
+    grid-area: info_box;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 10px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: left;
+
+    font-size: 2vh;
+
+    color: rgb(50, 97, 116);
+
+/*    background-color: rgb(232, 226, 37); */
+  }
+
+  .item_footer { 
+    grid-area: footer;
+    
+    padding-left: 5px;
+    font-size: 1.5vh;
+    font-style: normal;
+    color: whitesmoke;
+
+    display: flex;
+    align-items: center;
+    justify-content: left;
+
+    background-color: rgb(47, 51, 54); 
+  }
+

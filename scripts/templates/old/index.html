@@ -1,0 +1,39 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Flask App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_sample.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/grid.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to My Flask App, {{ name }}!</h1>
+    </header>
+    
+    <aside>
+        <h2>Sidebar</h2>
+        <ul>
+            <li>Link 1</li>
+            <li>Link 2</li>
+            <li>Link 3</li>
+        </ul>
+    </aside>
+    
+    <main>
+        <h2>Main Content</h2>
+        <p>This is the main content of the page.</p>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 My Flask App</p>
+    </footer>
+    
+    <form method="post">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" name="name" required>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

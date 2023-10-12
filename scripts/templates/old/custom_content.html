@@ -1,0 +1,18 @@
+<!-- templates/custom_content.html -->
+
+{% extends "nested_grid.html" %}
+
+{% block left_content scoped %}
+<label for="name">Your Name:</label>
+<input type="text" id="name" name="name" required>
+
+<label for="field1">Field 1:</label>
+<input type="text" id="field1" name="field1">
+<label for="field2">Field 2:</label>
+<input type="text" id="field2" name="field2">
+{% endblock %}
+
+{% block right_content %}
+<button type="submit">Submit</button>
+{% endblock %}
+

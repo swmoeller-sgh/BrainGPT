@@ -1,0 +1,51 @@
+<!-- templates/nested_grid.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Flask App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_sample.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/grid.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to My Flask App, {{ name }}!</h1>
+    </header>
+    
+    <aside>
+        <h2>Sidebar</h2>
+        <ul>
+            <li>Link 1</li>
+            <li>Link 2</li>
+            <li>Link 3</li>
+        </ul>
+    </aside>
+    
+    <main>
+        <h2>Main Content</h2>
+        <form method="post">
+        <section id="left-content">
+            <h3>Left Column</h3>
+            <div>
+                {% block left_content %}
+                    Default content
+                {% endblock %}
+            </div>
+        </section>
+        
+        <section id="right-content">
+            <h3>Right Column</h3>
+            <div>
+                {% block right_content %}
+                Default
+                {% endblock %}
+            </div>
+        </section>
+        </form>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 My Flask App</p>
+    </footer>
+</body>
+</html>

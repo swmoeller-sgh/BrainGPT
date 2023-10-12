@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_base.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_grid_layout_main.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style_grid_layout_question.css') }}">
+
+    <style>
+        :root {
+            --background-url: url('{{ url_for('static', filename='brain_floating_two_hands.png') }}');
+        }
+    </style>
+    <title>{% block title %}BrainGPT{% endblock %}</title>
+</head>
+
+
+<body style="margin: 0;">  {# removes the white margin on left and top side in browser view #}
+    <div class="grid_container">
+        <header class="item_header">
+            {% block header %}            
+                <p>No content found</p>
+            {% endblock header %}            
+        </header>
+
+        <nav class="item_navigation">
+            {% block navigation %}            
+                <p>No content found</p>
+            {% endblock navigation %}            
+        </nav>
+        
+        <section class="content_standard">
+            {% block content01 %}            
+                <p>No content found</p>
+            {% endblock content01 %}            
+        </section>
+
+        <section class="content_standard">
+            {% block content02 %}            
+                <p>No content found</p>
+            {% endblock content02 %}            
+        </section>
+        
+        <section class="item_infobox">
+            {% block info_box %}
+            <p>No content found</p>
+            {% endblock info_box%}
+        </section>
+
+        <div class="item_questiongrid">
+            {% block questiongrid %}
+                <div class="item_question">
+                    {% block question %}
+                        <p>No content found</p>
+                    {% endblock %}
+                </div>
+                <div class="item_questionnavigation">
+                    {% block questionnavigation %}
+                        <p>No content found</p>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+        
+        <main class="item_content">
+            {# Content of page #}
+            {% block content %}
+            <p>No content found</p>
+            {% endblock %}
+        </main>
+        
+        <section class="item_history">
+            {# Content of page #}
+            {% block history %}
+            <p>No content found</p>
+            {% endblock %}
+        </section>
+        
+        <footer class="item_footer">
+            &copy; Copyright (code & design) 2023 by Stefan W. Moeller. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,44 +1,36 @@
-{% extends "base.html" %}
+{% extends "grid_base.html" %}
 
-{% block title %} Homepage BrainGPT {% endblock %}
-
-
-{% block introduction %}
-	<strong>Background<br></strong>
-	BrainGPT is bringing your question right to our own knowledge base. 
-	Only in second instance (still to be developed), it turns towards OpenAI ChatGPT. 
-	Every source is marked, hence hallucination can be discovered comparable easy!
-{% endblock %}
-
-{% block question %}
-	<form action="/" method = "post">
-		{# token protects against malicious requests #}
-		{{ form.csrf_token() }}
-		{{ form.question }}
-		{{ form.submit }}
-		{{ form.new }} Continue conversation?
-	</form>
-{% endblock %}
+{% block header %}
+    <div>
+        BrainGPT - Home
+    </div>
+{% endblock header %}
 
 
-{% block content %}
-	{% if question %}
-    	<h3>Your last question:</h3>
-		{{ question }}
-    {% endif %}
-    {% if answer %}
-		<div class="result_box">
-			{{ answer.result.answer }}
-			<div class="italic-text">
-				Sources: {{ answer.result.source_documents }}
-			</div>
-		</div>
-    {% endif %}
-{% endblock %}
 
-{% block history %}
-<h3>Your past conversation on this topic</h3>
-<div class="history_box">
-	{{ historic_chat }}
-</div>
-{% endblock %}
+{% block content01 %}
+	<strong>Background<br><br></strong>
+	BrainGPT leverages our proprietary knowledge base to answer questions, providing sources for 
+	reference to identify potential inaccuracies. Questions can be generic or specific to 
+	knowledge collections. In a secondary phase, it may turn to OpenAI ChatGPT for 
+	further assistance.
+{% endblock content01 %}
+
+
+{% block content02 %}
+    <figure >
+
+        <img src= "{{ url_for('static', filename='brain_floating_two_hands.png') }}">
+    </figure>
+{% endblock content02 %}
+
+{% block info_box %}
+
+{% endblock info_box %}
+
+
+{% block footer %}
+    <div>
+        &copy; Copyright (code & design) 2023 by Stefan W. Moeller. All rights reserved.
+    </div>
+{% endblock footer %}

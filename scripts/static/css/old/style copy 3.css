@@ -2,7 +2,7 @@
     display: grid;
     height: 100vh;
     grid-template-rows: auto auto auto auto 1fr auto;;
-    gap: 0px 0px;
+    gap: 0px 0px; 
     grid-template-areas:
       "header header header"
       "navigation introduction empty_space"

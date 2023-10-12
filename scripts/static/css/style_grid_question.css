@@ -1,0 +1,66 @@
+  .item_questiongrid { 
+    grid-area: questiongrid; 
+    display: grid;
+
+    height: 77vh;    /* Set the height of the grid to fill the viewport */
+
+    grid-template-columns: 70% 30%;
+    grid-template-rows: 10% 20% 67%;
+
+    grid-template-areas:
+        "question questionnavigation"
+        "answer answer"
+        "history history";
+    
+    margin: 0;
+    padding: 0;
+    row-gap: 10px;
+
+/*    background-color: #dfc81b;*/
+  }
+
+  .item_question {
+    grid-area: question;
+
+    padding: 10px;
+
+    font-size: 1.6vh;
+
+    background-color: rgb(149, 191, 207); 
+/*    background-color: rgb(23, 202, 246);*/
+  }
+
+  .item_questionnavigation{
+    grid-area: questionnavigation;
+    
+    padding: 10px;
+    padding-right: 5px;
+  
+    font-size: 1.6vh;
+
+    background-color: rgb(149, 191, 207); 
+/*    background-color: rgb(54, 159, 63);*/
+  }
+
+  .item_answer {
+    grid-area: answer;
+
+    overflow: auto;
+
+    padding: 10px;
+
+    font-size: 1.6vh;
+
+/*    background-color: rgb(122, 224, 27);*/
+  }
+  .item_history {
+    grid-area: history;
+
+    padding: 10px;
+
+    overflow: auto;
+
+    font-size: 1.6vh;
+
+/*    background-color: rgb(115, 16, 214);*/
+  }
