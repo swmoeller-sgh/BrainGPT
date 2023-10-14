@@ -7,9 +7,8 @@
 {% endblock header %}
 
 
-
-{% block content01 scoped %}
-    <form method="post">
+<form method="post"  action="{{ url_for('question') }}">
+    {% block content01 scoped %}
         <section class="item_questiongrid">       
             <section class="item_question">
                 {% block question %}
@@ -37,23 +36,22 @@
                 {% endblock history %}
             </section>
         </section>
-    </form>
-{% endblock content01 %}
+    {% endblock content01 %}
 
-
-{% block content02 %}
-You can narrow down the search to focus on certain areas of interest. In this case, only selected 
-collections in the ChromaDB will be used retrieve the respective embeddings.<br>
-<ul>
-    <input type="checkbox" id="business" name="business" value="True">
-    <label for="business"> Business focus </label><br>
-    <input type="checkbox" id="private" name="private" value="True">
-    <label for="private"> Private focus </label><br>
-    <input type="checkbox" id="sailing" name="sailing" value="True">
-    <label for="sailing"> Sailing </label><br>
-</ul>
-{% endblock content02 %}
-
+    {% block content02 %}
+        {#<form method="post"  action="{{ url_for('question') }}"> #}
+        You can narrow down the search to focus on certain areas of interest. In this case, only selected 
+        collections in the ChromaDB will be used retrieve the respective embeddings.<br>
+        <ul>
+            <input type="checkbox" id="business" name="business" value="True">
+            <label for="business"> Business focus </label><br>
+            <input type="checkbox" id="private" name="private" value="True">
+            <label for="private"> Private focus </label><br>
+            <input type="checkbox" id="sailing" name="sailing" value="True">
+            <label for="sailing"> Sailing </label><br>
+        </ul>
+    {% endblock content02 %}
+</form>
 
 {% block info_box %}
 	BrainGPT leverages our proprietary knowledge base to answer questions, providing sources for 

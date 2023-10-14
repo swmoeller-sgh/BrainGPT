@@ -138,7 +138,7 @@ def index():                             #pylint: disable=W0102
 @app.route("/question", methods=["GET", "POST"])        # Define the question route "/question"
 def question(in__debug_mode=DEBUG_MODE,
              in__debug_answer=debug_answer              #pylint: disable=W0102
-              ):                                        #pylint: disable=W0102
+              ):
     """
     Define the question route ("/question").
 
@@ -157,7 +157,7 @@ def question(in__debug_mode=DEBUG_MODE,
 
         continue_conversation = request.form.get("c_conv")
         if continue_conversation == "True":
-            logging.info("Result of checkbox: %s", continue_conversation)
+            logging.info("Contimue conversation: %s", continue_conversation)
 
         collection_business = request.form.get("business")
         if collection_business == "True":
@@ -174,7 +174,6 @@ def question(in__debug_mode=DEBUG_MODE,
 
         else:
             out_answer_dict = get_answer(in__question=form_question)
-            print(out_answer_dict)
             proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"][:20]
