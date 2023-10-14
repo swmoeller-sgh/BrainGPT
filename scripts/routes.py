@@ -18,9 +18,9 @@ Purpose
 # Import system packages
 import os
 import logging
-from datetime import datetime
+# from datetime import datetime
 
-import forms    #pylint: disable=E0401
+# import forms    #pylint: disable=E0401
 
 import json
 
@@ -30,10 +30,9 @@ from langchain.llms import OpenAI
 
 # Import own packages
 from braingpt_app import app
-from braingpt_config import config_braingpt    #pylint: disable=E0401
+from braingpt_config import config_braingpt     #pylint: disable=E0401
 from braingpt_src import generate_answer        #pylint: disable=E0401
 
-from flask import Flask, render_template, request, url_for, flash, redirect
 
 
 
@@ -123,7 +122,7 @@ logging.info("Local answer loaded.")
 
 # [ROUTING definition]
 @app.route("/", methods=["GET"])         # Define the index route "/"
-def index():                            #pylint: disable=W0102
+def index():                             #pylint: disable=W0102
     """
     Define the index route ("/").
 
@@ -136,10 +135,10 @@ def index():                            #pylint: disable=W0102
     return render_template("index.html")
 
 
-@app.route("/question", methods=["GET", "POST"])         # Define the index route "/"
+@app.route("/question", methods=["GET", "POST"])        # Define the question route "/question"
 def question(in__debug_mode=DEBUG_MODE,
-             in__debug_answer=debug_answer        # INDEX route               #pylint: disable=W0102
-              ):                                         #pylint: disable=W0102
+             in__debug_answer=debug_answer              #pylint: disable=W0102
+              ):                                        #pylint: disable=W0102
     """
     Define the question route ("/question").
 
@@ -148,16 +147,14 @@ def question(in__debug_mode=DEBUG_MODE,
     str
         Rendered template for the question page with the answer.
     """
-        
+
     form_question = ""
-    out_answer = ""
-    document_names=""
-    question = ""
+    proc_question = ""
     answer = ""
     source = ""
 
     if request.method == "POST":
-    
+
         continue_conversation = request.form.get("c_conv")
         if continue_conversation == "True":
             logging.info("Result of checkbox: %s", continue_conversation)
@@ -171,14 +168,14 @@ def question(in__debug_mode=DEBUG_MODE,
 
         if in__debug_mode is True:
             out_answer_dict = in__debug_answer
-            question = out_answer_dict["question"]
+            proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"]
 
         else:
             out_answer_dict = get_answer(in__question=form_question)
             print(out_answer_dict)
-            question = out_answer_dict["question"]
+            proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"][:20]
 #            document_names = [document.get('metadata', {}).get('source', '')[:20] for document in source]
@@ -189,10 +186,10 @@ def question(in__debug_mode=DEBUG_MODE,
 #        question_chain.append({"date": date_time, "question": in_question})
 #        print(question_chain)
 #        logging.info(question_chain)
-        
-    return render_template("question.html", 
-                           form_question=form_question, 
-                           question = question,
+
+    return render_template("question.html",
+                           form_question=form_question,
+                           question = proc_question,
                            answer = answer,
                            source = source)
 
