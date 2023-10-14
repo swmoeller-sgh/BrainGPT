@@ -178,7 +178,7 @@ def question(in__debug_mode=DEBUG_MODE,
             proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"][:20]
-#            document_names = [document.get('metadata', {}).get('source', '')[:20] for document in source]
+#      document_names = [document.get('metadata', {}).get('source', '')[:20] for document in source]
 
 
         #date_time = str(datetime.now())

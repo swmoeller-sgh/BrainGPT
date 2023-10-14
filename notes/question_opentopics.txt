@@ -1,0 +1,19 @@
+    <div class="item_questiongrid">
+
+        <section class="item_question">
+            <div>
+            {% block question %}
+                <label for="question">Your question:</label>
+                <input type="text" id="question" question="question" required>
+            {% endblock question %}
+            </div>
+        </section>
+        <section class= "item_questionnavigation">
+            <div>
+            {% block questionnavigation %}
+                <button type="submit">Submit</button>
+            {% endblock questionnavigation %}
+            </div>
+        </section>
+
+    </div>
