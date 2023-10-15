@@ -7,51 +7,73 @@
 {% endblock header %}
 
 
-<form method="post"  action="{{ url_for('question') }}">
-    {% block content01 scoped %}
-        <section class="item_questiongrid">       
-            <section class="item_question">
-                {% block question %}
-                    <label for="form_question">Your question:</label>
-                    <input type="text" id="form_question" name="form_question" required>
-                {% endblock question %}
-            </section>
-            <section class= "item_questionnavigation">
-                {% block questionnavigation %}
-                    <button type="submit">Submit</button><br> 
-                    <input type="checkbox" id="c_conv" name="c_conv" value="True">
-                    <label for="c_conv">Continue conversation</label>
-                {% endblock questionnavigation %}
-            </section>
-            <section class="item_answer">
-                {% block answer %}
-                    <strong>Question: </strong> {{ question }}<br>
-                    <strong>Answer: </strong> {{ answer }}<br>
-                    <strong>Reference: </strong> {{ source }}<br>
-                {% endblock answer %}
-            </section>            
-            <section class="item_history">
-                {% block history %}
-                    {{ form_question }}
-                {% endblock history %}
-            </section>
-        </section>
-    {% endblock content01 %}
 
-    {% block content02 %}
-        {#<form method="post"  action="{{ url_for('question') }}"> #}
-        You can narrow down the search to focus on certain areas of interest. In this case, only selected 
-        collections in the ChromaDB will be used retrieve the respective embeddings.<br>
-        <ul>
-            <input type="checkbox" id="business" name="business" value="True">
-            <label for="business"> Business focus </label><br>
-            <input type="checkbox" id="private" name="private" value="True">
-            <label for="private"> Private focus </label><br>
-            <input type="checkbox" id="sailing" name="sailing" value="True">
-            <label for="sailing"> Sailing </label><br>
-        </ul>
-    {% endblock content02 %}
-</form>
+{% block content01 scoped %}
+<div class= "item_content01">
+    {% block questiongrid %}
+        <section class="item_questiongrid">       
+            <form method="post" action="{{ url_for('question') }}">
+
+                {% block question scoped %}
+                    <section class="item_question">
+                        <label for="form_question">Your question:</label>
+                        <input type="text" id="form_question" name="form_question" required>
+                    </section>
+                {% endblock question %}
+
+                {% block questionnavigation scoped %}
+                    <section class= "item_questionnavigation">
+                        <input type="checkbox" id="c_conv" name="c_conv" value="True">
+                        <label for="c_conv">Continue conversation</label>
+                    </section>
+                {% endblock questionnavigation %}
+
+
+                {% block set_configuration scoped %}
+                    <section class="item_configuration">
+                    {#<form method="post"  action="{{ url_for('question') }}"> #}
+                        You can narrow down the search to focus on certain areas of interest. In this case, only selected 
+                        collections in the ChromaDB will be used retrieve the respective embeddings.<br>
+                        <ul>
+                            <input type="checkbox" id="business" name="business" value="True">
+                            <label for="business"> Business focus </label><br>
+                            <input type="checkbox" id="private" name="private" value="True">
+                            <label for="private"> Private focus </label><br>
+                            <input type="checkbox" id="sailing" name="sailing" value="True">
+                            <label for="sailing"> Sailing </label><br>
+                        </ul>
+                    </section>
+                {% endblock set_configuration %}
+                    <button type="submit">Submit</button><br> 
+            </form>
+        </section>
+    {% endblock questiongrid %}     
+    </div>   
+{% endblock content01 %}
+
+    
+{% block content02 %}
+    <div class= "item_content02">
+        {% block answer_grid %}
+            <div class= "item_answergrid">
+                {% block answer %}
+                    <div class= "box item_answer">
+                        <strong>Question: </strong> {{ question }}<br><br>
+                        <strong>Answer: </strong> {{ answer }}<br><br>
+                        <strong>Reference: </strong> {{ source }}
+                    </div>            
+                {% endblock answer %}
+
+                {% block history %}
+                    <div class="box item_history">
+                        {{ form_question }}
+                    </div>
+                {% endblock history %}
+            </div>      
+        {% endblock answer_grid %}
+    </div>
+{% endblock content02 %}
+
 
 {% block info_box %}
 	BrainGPT leverages our proprietary knowledge base to answer questions, providing sources for 
