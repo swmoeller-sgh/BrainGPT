@@ -9,45 +9,45 @@
 
 
 {% block content01 scoped %}
-<div class= "item_content01">
-    {% block questiongrid %}
-        <section class="item_questiongrid">       
-            <form method="post" action="{{ url_for('question') }}">
+    <div class= "item_content01">
+        {% block questiongrid %}
+            <section class="item_questiongrid">       
+                <form method="post" action="{{ url_for('question') }}">
 
-                {% block question scoped %}
-                    <section class="item_question">
-                        <label for="form_question">Your question:</label>
-                        <input type="text" id="form_question" name="form_question" required>
-                    </section>
-                {% endblock question %}
+                    {% block question scoped %}
+                        <section class="item_question">
+                            <label for="form_question">Your question:</label>
+                            <input type="text" id="form_question" name="form_question" required>
+                        </section>
+                    {% endblock question %}
 
-                {% block questionnavigation scoped %}
-                    <section class= "item_questionnavigation">
-                        <input type="checkbox" id="c_conv" name="c_conv" value="True">
-                        <label for="c_conv">Continue conversation</label>
-                    </section>
-                {% endblock questionnavigation %}
+                    {% block questionnavigation scoped %}
+                        <section class= "item_questionnavigation">
+                            <input type="checkbox" id="c_conv" name="c_conv" value="True">
+                            <label for="c_conv">Continue conversation</label>
+                        </section>
+                    {% endblock questionnavigation %}
 
 
-                {% block set_configuration scoped %}
-                    <section class="item_configuration">
-                    {#<form method="post"  action="{{ url_for('question') }}"> #}
-                        You can narrow down the search to focus on certain areas of interest. In this case, only selected 
-                        collections in the ChromaDB will be used retrieve the respective embeddings.<br>
-                        <ul>
-                            <input type="checkbox" id="business" name="business" value="True">
-                            <label for="business"> Business focus </label><br>
-                            <input type="checkbox" id="private" name="private" value="True">
-                            <label for="private"> Private focus </label><br>
-                            <input type="checkbox" id="sailing" name="sailing" value="True">
-                            <label for="sailing"> Sailing </label><br>
-                        </ul>
-                    </section>
-                {% endblock set_configuration %}
-                    <button type="submit">Submit</button><br> 
-            </form>
-        </section>
-    {% endblock questiongrid %}     
+                    {% block set_configuration scoped %}
+                        <section class="item_configuration">
+                        {#<form method="post"  action="{{ url_for('question') }}"> #}
+                            You can narrow down the search to focus on certain areas of interest. In this case, only selected 
+                            collections in the ChromaDB will be used retrieve the respective embeddings.<br>
+                            <ul>
+                                <input type="checkbox" id="business" name="business" value="True">
+                                <label for="business"> Business focus </label><br>
+                                <input type="checkbox" id="private" name="private" value="True">
+                                <label for="private"> Private focus </label><br>
+                                <input type="checkbox" id="sailing" name="sailing" value="True">
+                                <label for="sailing"> Sailing </label><br>
+                            </ul>
+                        </section>
+                    {% endblock set_configuration %}
+                        <button type="submit">Submit</button><br> 
+                </form>
+            </section>
+        {% endblock questiongrid %}     
     </div>   
 {% endblock content01 %}
 
