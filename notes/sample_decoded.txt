@@ -1,0 +1,24 @@
+{
+    'a82e179e-413e-5b03-9eca-7228d66e9416': 
+    {'What is a viable system model?': 
+        {'Answer': 'A viable system model is a conceptual framework developed by British scientist 
+        and cybernetician Stafford Beer to help organizations design and manage their operations. 
+        It is based on the idea that organizations are complex systems that need to be managed 
+        in a holistic way in order to be successful. The model consists of five subsystems
+        : environment, operations, control, information, and decision-making.'
+        , 'Source': None}}, 
+    'a3f359e3-0d58-5f42-a2ee-0ea0d4497af1': 
+    {'What is environment?': 
+        {'Answer': 'The environment subsystem of the viable system model is the subsystem that 
+        monitors and responds to external changes in the environment. It is responsible for 
+        gathering information about the external environment and providing feedback to the other 
+        subsystems.'
+        , 'Source': None}}, 
+    'fe22266b-f216-5b0a-ab2b-b1e4d7f78285': 
+    {'How does it provide feedback to other subsystems?': 
+        {'Answer': 'The environment subsystem of the viable system model provides feedback 
+        to the other subsystems by monitoring external changes and providing information 
+        about the external environment. This information can be used to inform decisions and 
+        strategies within the other subsystems.'
+        , 'Source': None}}
+} 
