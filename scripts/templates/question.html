@@ -23,7 +23,7 @@
 
                     {% block questionnavigation scoped %}
                         <section class= "item_questionnavigation">
-                            <input type="checkbox" id="c_conv" name="c_conv" value="True">
+                            <input type="checkbox" id="c_conv" name="c_conv" value="True" checked>
                             <label for="c_conv">Continue conversation</label>
                         </section>
                     {% endblock questionnavigation %}
@@ -66,7 +66,19 @@
 
                 {% block history %}
                     <div class="box item_history">
-                        {{ form_question }}
+                        <ul>
+                            {% for key, value in history.items() %}
+                                {% for question, qa_data in value.items() %}
+                                    <li>
+                                        <h3>{{ question }}</h3>
+                                        <ul>
+                                            <li><strong>Answer:</strong> {{ qa_data['Answer'] }}</li>
+                                            <li><strong>Source:</strong> {{ qa_data['Source'] or 'N/A' }}</li>
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
                     </div>
                 {% endblock history %}
             </div>      
