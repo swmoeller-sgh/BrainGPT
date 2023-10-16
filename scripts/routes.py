@@ -18,13 +18,14 @@ Purpose
 # Import system packages
 import os
 import logging
+import uuid
 # from datetime import datetime
 
 # import forms    #pylint: disable=E0401
 
 import json
 
-from flask import render_template, request
+from flask import render_template, request, session
 from langchain.llms import OpenAI
 
 
@@ -43,7 +44,8 @@ BRAINGPT_INQUIRY_LOG_FILE = os.path.join(ROOT_DIR,  # Define the path to the que
                                          str(os.getenv("LOG_DIR")),
                                          str(os.getenv("QUERY_LOG_NAME")))
 question_chain=[]
-historic_communication = []             # Store historic communication
+# historic_communication = []             # Store historic communication
+chat_history = []
 
 
 # [LOGGING settings]
@@ -64,7 +66,7 @@ llm_temp0 = OpenAI(temperature=0)   # OpenAI instance with temperature set to 0 
 
 # [FUNCTION definition]
 def get_answer(in__question,            # Define get_answer function        #pylint: disable=W0102
-               in__chat_history=[]):
+               in__chat_history):
     """
     Query information from the language model.
 
@@ -112,6 +114,36 @@ def get_local_answer(in__filepath):
     return sample_answer
 
 
+def structure_answer(in__json):
+
+    # Initialize the nested dictionary
+    nested_dict = {}
+
+    for question, answer in in__json:
+        # Clean up the answer by removing leading and trailing whitespaces and '\n'
+        answer = answer.strip()
+        
+        # Check if the answer contains "I don't know" or similar phrases to classify it as a source
+        if "I don't know" in answer:
+            answer_data = {
+                'Answer': None,
+                'Source': None  # Placeholder for source (to be added later)
+            }
+        else:
+            answer_data = {
+                'Answer': answer,
+                'Source': None  # Placeholder for source (to be added later)
+            }
+        
+        # Generate a unique UUID based on the question, date, and time
+        unique_id = uuid.uuid5(uuid.NAMESPACE_DNS, f"{question}_{str(uuid.uuid1())}")
+        
+        # Create or update the nested dictionary
+        nested_dict[str(unique_id)] = {question: answer_data}
+
+    return nested_dict
+
+
 
 # Derive the local testing debug_answer
 local_answer = get_local_answer(in__filepath="data/sample_answer02.txt")
@@ -152,12 +184,16 @@ def question(in__debug_mode=DEBUG_MODE,
     proc_question = ""
     answer = ""
     source = ""
+    format_chat_history = ""
+
+
+    # Initialize chat history from the session or create an empty list
+    chat_history = session.get('chat_history', [])
 
     if request.method == "POST":
 
         continue_conversation = request.form.get("c_conv")
-        if continue_conversation == "True":
-            logging.info("Contimue conversation: %s", continue_conversation)
+        logging.info("Contimue conversation: %s", continue_conversation)
 
         collection_business = request.form.get("business")
         if collection_business == "True":
@@ -173,10 +209,22 @@ def question(in__debug_mode=DEBUG_MODE,
             source = out_answer_dict["result"]["source_documents"]
 
         else:
-            out_answer_dict = get_answer(in__question=form_question)
+            if continue_conversation != "True":
+                chat_history=[]
+        
+            out_answer_dict = get_answer(in__question=form_question, 
+                                    in__chat_history=chat_history)
             proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"][:20]
+            chat_history.append((proc_question,answer))
+            logging.info("Chat history: %s\n",chat_history)
+     
+            
+        # Store the updated chat history in the session
+        session['chat_history'] = chat_history
+        format_chat_history = structure_answer(chat_history)
+
 #      document_names = [document.get('metadata', {}).get('source', '')[:20] for document in source]
 
 
@@ -190,54 +238,5 @@ def question(in__debug_mode=DEBUG_MODE,
                            form_question=form_question,
                            question = proc_question,
                            answer = answer,
-                           source = source)
-
-'''
-@app.route("/old", methods=["GET", "POST"])        # Define the index route "/"
-def index1(in__debug_answer=debug_answer,        # INDEX route               #pylint: disable=W0102
-          in__debug_mode=DEBUG_MODE,
-          in__historic_communication=historic_communication):
-    """
-    Definition of the index page
-
-    Returns
-    -------
-    html generated from template
-        Updated index page (from jinja template)
-    """
-    logging.info("index-page called")
-    form = forms.RaiseQuestionForm()
-
-    if form.validate_on_submit() is True:
-#        print("Continue conversation: ", form.new.data)
-
-#        if form.new.data is False:
-#            in__historic_communication = []
-
-        question = form.question.data
-        print("Question raised:", question)
-
-
-        if in__debug_mode is True:
-            logging.info("DEBUG mode activated, pre-configured answers only!\n")
-            answer = in__debug_answer
-
-        else:
-            logging.info("DEBUG mode deactivated!\n")
-            # // FIXME: Reference documents not shown
-            answer = get_answer(question, in__chat_history=in__historic_communication)
-
-        update_historic_chat = (question, answer["result"]["answer"])
-        in__historic_communication.append(update_historic_chat)
-        print(in__historic_communication)
-
-        return render_template("index",
-                               form=form,
-                               question=question,
-                               answer=answer,
-                               historic_chat=in__historic_communication
-                               )
-
-    return render_template(template_name_or_list="index.html",
-                           form=form)
-'''
+                           source = source,
+                           history = format_chat_history)
