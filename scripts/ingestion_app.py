@@ -27,7 +27,7 @@ import pandas as pd # Pandas library for data manipulation and analysis
 
 # Custom module imports related to langchain, a specific library or framework
 from langchain.document_loaders import TextLoader  # Text document loading for langchain
-from langchain.vectorstores import Chroma  # Vector storage for langchain
+from langchain.vectorstores.chroma import Chroma  # Vector storage for langchain
 from langchain.embeddings import OpenAIEmbeddings  # Embeddings for langchain
 from langchain.text_splitter import RecursiveCharacterTextSplitter  # Text splitting for langchain
 
@@ -47,6 +47,7 @@ from langchain.document_loaders import (
     UnstructuredWordDocumentLoader,  # Handles loading text from unstructured Word documents.
 )
 
+import chromadb
 from chromadb.config import Settings # Importing a specific configuration settings modul
 
 #pylint: disable=E0401
@@ -91,10 +92,12 @@ logging.info("Source directory for documents: %s\n", DOC2SCAN_DATA_DIR)
 
 # [CONSTANTS definition]
 CHROMA_SETTINGS = Settings(
-        chroma_db_impl='duckdb+parquet',
+#        chroma_db_impl='duckdb+parquet',
         persist_directory=PROCESSED_DATA_DIR,
         anonymized_telemetry=False
 )
+
+chroma_client = chromadb.PersistentClient(path=PROCESSED_DATA_DIR)
 
 LOADER_MAPPING = {
     ".csv": (CSVLoader, {}),
@@ -537,8 +540,8 @@ def existence_vectorstore(in__datastore_location: str) -> bool:
 
 
 def update_vectorstore(in__datastore_location: str,
+                       in__chroma_client,
                        in__embedding_function,
-                       in__chromadb_setting,
                        in__text_chunks):
     """
     Update a vector store with new text chunks.
@@ -576,10 +579,9 @@ def update_vectorstore(in__datastore_location: str,
 
         # Loading the existing vector store
         vectordb = Chroma(
-            persist_directory=in__datastore_location,
-            embedding_function=in__embedding_function,
-            client_settings=in__chromadb_setting
-        )
+            client=in__chroma_client,
+            embedding_function=in__embedding_function
+            )
         logging.info("Vector store loaded from location <%s>", in__datastore_location)
 
         # Adding the provided text chunks to the vector store
@@ -592,12 +594,20 @@ def update_vectorstore(in__datastore_location: str,
                       in__datastore_location)
 
         # Creating a new vector store and adding the text chunks
+
+        vectordb = Chroma.from_documents(
+                    client=in__chroma_client,
+                    documents=in__text_chunks,
+                    embedding=in__embedding_function,
+                )
+        '''
         vectordb = Chroma.from_documents(
             documents=in__text_chunks,
             embedding=in__embedding_function,
             persist_directory=in__datastore_location,
             client_settings=in__chromadb_setting
-        )
+     )
+        '''
         logging.info("A total of %s file chunks were imported into the vector store.\n",
                      len(in__text_chunks))
 
@@ -775,8 +785,8 @@ def main_execution():
     # Update the vector store with the imported text chunks.
     update_vectorstore(
         in__datastore_location=PROCESSED_DATA_DIR,
+        in__chroma_client=chroma_client,
         in__embedding_function=embeddings,
-        in__chromadb_setting=CHROMA_SETTINGS,
         in__text_chunks=text_chunks
     )
 
