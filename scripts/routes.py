@@ -26,7 +26,7 @@ import uuid
 import json
 
 from flask import render_template, request, session
-from langchain.llms import OpenAI
+from langchain.llms.openai import OpenAI
 
 
 # Import own packages
@@ -66,7 +66,8 @@ llm_temp0 = OpenAI(temperature=0)   # OpenAI instance with temperature set to 0 
 
 # [FUNCTION definition]
 def get_answer(in__question,            # Define get_answer function        #pylint: disable=W0102
-               in__chat_history):
+               in__chat_history,
+               in__llm):
     """
     Query information from the language model.
 
@@ -83,11 +84,10 @@ def get_answer(in__question,            # Define get_answer function        #pyl
         JSON response containing query, result, and document_references.
     """
 
-    answer = generate_answer.process_question_chained(in__question=in__question,
-                                                      in__llm=llm_temp0,
+    result = generate_answer.qa_chained_history(in__question=in__question,
+                                                      in__llm=in__llm,
                                                       in__chat_history=in__chat_history)
-    return answer
-
+    return result
 
 def get_local_answer(in__filepath):
     """
@@ -106,15 +106,46 @@ def get_local_answer(in__filepath):
 
     try:
         with open(in__filepath, "r", encoding="utf-8") as file:
-            sample_answer = file.read()
+            sample_result = file.read()
     except FileNotFoundError:
         print(f"File '{in__filepath}' not found.")
-        sample_answer = None
+        sample_result = None
 
-    return sample_answer
+    return sample_result
+
+
+def decompose_answer(in__json):
+
+    input_question = in__json['question']
+    output_answer = in__json['result']['answer']
+
+    # Extract and shorten the page content for each source document to a maximum of 50 letters
+    sources = []
+    for doc in in__json['result']['source_documents']:
+        short_content = doc['page_content'][0:50]
+        source_url = doc['metadata']['source']
+        sources.append([short_content, source_url])
+
+    return input_question, output_answer,sources
 
 
 def structure_answer(in__json):
+    """
+    Create a nested dictionary from a JSON input, where each question is associated with an answer 
+    and potential source information.
+
+    Parameters:
+    in__json (list): A list of question-answer pairs in JSON format.
+
+    Returns:
+    dict: A nested dictionary where each unique identifier (UUID) is associated with a question 
+          and answer data structure. 
+          If the answer contains phrases like "I don't know," the source information is left as 
+          a placeholder.
+    """
+
+    # Reverse the chat history to have the most recent entry at the top
+    in__json = in__json[::-1]
 
     # Initialize the nested dictionary
     nested_dict = {}
@@ -122,7 +153,7 @@ def structure_answer(in__json):
     for question, answer in in__json:
         # Clean up the answer by removing leading and trailing whitespaces and '\n'
         answer = answer.strip()
-        
+
         # Check if the answer contains "I don't know" or similar phrases to classify it as a source
         if "I don't know" in answer:
             answer_data = {
@@ -134,22 +165,17 @@ def structure_answer(in__json):
                 'Answer': answer,
                 'Source': None  # Placeholder for source (to be added later)
             }
-        
+
         # Generate a unique UUID based on the question, date, and time
         unique_id = uuid.uuid5(uuid.NAMESPACE_DNS, f"{question}_{str(uuid.uuid1())}")
-        
+
         # Create or update the nested dictionary
         nested_dict[str(unique_id)] = {question: answer_data}
 
     return nested_dict
 
 
-
-# Derive the local testing debug_answer
-local_answer = get_local_answer(in__filepath="data/sample_answer02.txt")
-debug_answer = json.loads(local_answer) # type: ignore
-logging.info("Local answer loaded.")
-
+debug_answer = get_local_answer(in__filepath="data/sample_answer05.txt")
 
 
 # [ROUTING definition]
@@ -168,9 +194,10 @@ def index():                             #pylint: disable=W0102
 
 
 @app.route("/question", methods=["GET", "POST"])        # Define the question route "/question"
-def question(in__debug_mode=DEBUG_MODE,
-             in__debug_answer=debug_answer              #pylint: disable=W0102
-              ):
+def question(in__llm=llm_temp0,
+             in__debug_mode=DEBUG_MODE,
+             in__debug_answer=debug_answer,              #pylint: disable=W0102
+             ):
     """
     Define the question route ("/question").
 
@@ -185,6 +212,11 @@ def question(in__debug_mode=DEBUG_MODE,
     answer = ""
     source = ""
     format_chat_history = ""
+
+# // TODO Optimize ChromaDB to utilize different collections
+# // TODO Include history / reference to source
+# // TODO Investigate the application of different languages
+
 
 
     # Initialize chat history from the session or create an empty list
@@ -204,6 +236,7 @@ def question(in__debug_mode=DEBUG_MODE,
 
         if in__debug_mode is True:
             out_answer_dict = in__debug_answer
+#            proc_question, answer, source = decompose_answer(in__json=out_answer_dict)
             proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"]
@@ -211,28 +244,22 @@ def question(in__debug_mode=DEBUG_MODE,
         else:
             if continue_conversation != "True":
                 chat_history=[]
-        
-            out_answer_dict = get_answer(in__question=form_question, 
-                                    in__chat_history=chat_history)
+
+            out_answer_dict = get_answer(in__question=form_question,
+                                    in__chat_history=chat_history,
+                                    in__llm=in__llm)
+#            proc_question, answer, source = decompose_answer(in__json=out_answer_dict)
+
             proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
             source = out_answer_dict["result"]["source_documents"][:20]
             chat_history.append((proc_question,answer))
             logging.info("Chat history: %s\n",chat_history)
-     
-            
+
+
         # Store the updated chat history in the session
         session['chat_history'] = chat_history
         format_chat_history = structure_answer(chat_history)
-
-#      document_names = [document.get('metadata', {}).get('source', '')[:20] for document in source]
-
-
-        #date_time = str(datetime.now())
-
-#        question_chain.append({"date": date_time, "question": in_question})
-#        print(question_chain)
-#        logging.info(question_chain)
 
     return render_template("question.html",
                            form_question=form_question,

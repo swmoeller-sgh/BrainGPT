@@ -1,3 +1,6 @@
+# import sys
+# sys.path.append('/Users/swmoeller/python/2023/large_language_model/BrainGPT/src/braingpt_config/')
+
 """
 [Purpose]
 =========
@@ -8,8 +11,9 @@ Query our own data
 
 """
 # // TODO: Move to local processing for better efficiency (see LinkedIn article and Obsidian notes).
-# // TODO: Implement an empty form at the beginning for user input.
-# // FIXME: Address the issue of an empty historic chat at the beginning.
+# // DONE: Implement an empty form at the beginning for user input.
+# // DONE: Address the issue of an empty historic chat at the beginning.
+
 
 # [IMPORTS of modules and packages]
 import logging
@@ -19,15 +23,13 @@ from dotenv import load_dotenv, find_dotenv # Dotenv library for loading env. va
 
 import openai  # OpenAI library for working with OpenAI's GPT-3 or other models
 
+#import routes
+
+#from flask_wtf.csrf import CSRFProtect
+
 from flask import Flask
 
 from braingpt_config import config_braingpt #pylint: disable=E0401
-import routes
-
-from flask_wtf.csrf import CSRFProtect
-from flask import Flask, render_template, request, url_for, flash, redirect
-
-
 
 # [INITIALIZE environment]
 env_file = find_dotenv(".env")

@@ -1,0 +1,98 @@
+{
+    'question': 'Question string', 
+    'chat_history': [], 
+    'answer': ' Answer string', 
+    'source_documents': 
+    [
+        Document(
+            page_content='Extract from book', 
+            metadata={'source': 'path'}), 
+
+        Document(
+            page_content='Extract from book', 
+            metadata={'source': 'path'}), 
+    
+        Document
+            (
+                page_content='Extract from book', 
+                metadata={'source': 'path'}
+            )
+    ]
+}
+
+
+{
+    'question': 'Question string',
+    'chat_history': [],
+    'answer': 'Answer string',
+    'source_documents': [
+        {
+            'page_content': 'Extract from book',
+            'metadata': {'source': 'path'}
+        },
+        {
+            'page_content': 'Extract from book',
+            'metadata': {'source': 'path'}
+        },
+        {
+            'page_content': 'Extract from book',
+            'metadata': {'source': 'path'}
+        }
+    ]
+}
+
+
+{'question': 'Question string', 
+'chat_history': [], 
+'answer': ' Answer string', 
+'source_documents': [
+    {
+        'page_content'='Extract from book',
+        'metadata'={'source': 'path'}
+    },
+    {
+        'page_content'='Extract from book','metadata'={'source': 'path'}}, {'page_content'='Extract from book', 'metadata'={'source': 'path'}}]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+data = {
+    'question': 'Question string',
+    'chat_history': [],
+    'answer': 'Answer string',
+    'source_documents': [
+        {'page_content': 'Extract from book', 'metadata': {'source': 'path'}},
+        {'page_content': 'Extract from book', 'metadata': {'source': 'path'}},
+        {'page_content': 'Extract from book', 'metadata': {'source': 'path'}}
+    ]
+}
+
+nested_dict = {
+    'person1': {
+        'name': 'Alice',
+        'age': 30,
+        'address': {
+            'street': '123 Main St',
+            'city': 'Exampleville',
+            'zipcode': '12345'
+        }
+    },
+    'person2': {
+        'name': 'Bob',
+        'age': 25,
+        'address': {
+            'street': '456 Elm St',
+            'city': 'Sampletown',
+            'zipcode': '54321'
+        }
+    }
+}

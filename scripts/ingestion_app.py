@@ -92,7 +92,6 @@ logging.info("Source directory for documents: %s\n", DOC2SCAN_DATA_DIR)
 
 # [CONSTANTS definition]
 CHROMA_SETTINGS = Settings(
-#        chroma_db_impl='duckdb+parquet',
         persist_directory=PROCESSED_DATA_DIR,
         anonymized_telemetry=False
 )
@@ -600,14 +599,7 @@ def update_vectorstore(in__datastore_location: str,
                     documents=in__text_chunks,
                     embedding=in__embedding_function,
                 )
-        '''
-        vectordb = Chroma.from_documents(
-            documents=in__text_chunks,
-            embedding=in__embedding_function,
-            persist_directory=in__datastore_location,
-            client_settings=in__chromadb_setting
-     )
-        '''
+
         logging.info("A total of %s file chunks were imported into the vector store.\n",
                      len(in__text_chunks))
 

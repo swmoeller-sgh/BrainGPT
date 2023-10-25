@@ -67,17 +67,21 @@
                 {% block history %}
                     <div class="box item_history">
                         <ul>
-                            {% for key, value in history.items() %}
-                                {% for question, qa_data in value.items() %}
-                                    <li>
-                                        <h3>{{ question }}</h3>
-                                        <ul>
-                                            <li><strong>Answer:</strong> {{ qa_data['Answer'] }}</li>
-                                            <li><strong>Source:</strong> {{ qa_data['Source'] or 'N/A' }}</li>
-                                        </ul>
-                                    </li>
+                            {% if history %}
+                                {% for key, value in history.items() %}
+                                    {% for question, qa_data in value.items() %}
+                                        <li>
+                                            <h3>{{ question }}</h3>
+                                            <ul>
+                                                <li><strong>Answer:</strong> {{ qa_data['Answer'] }}</li>
+                                                <li><strong>Source:</strong> {{ qa_data['Source'] or 'N/A' }}</li>
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
+                            {% else %}
+                                <li>No history available</li>
+                            {% endif %}
                         </ul>
                     </div>
                 {% endblock history %}
