@@ -175,7 +175,10 @@ def structure_answer(in__json):
     return nested_dict
 
 
-debug_answer = get_local_answer(in__filepath="data/sample_answer05.txt")
+local_answer = get_local_answer(in__filepath="data/sample_answer02.txt")
+local_answer_dict = eval(local_answer.replace("'", "\""))   #pylint: disable=W0123
+#debug_answer = json.loads(local_answer) # type: ignore
+logging.info("Local answer loaded.")
 
 
 # [ROUTING definition]
@@ -196,7 +199,7 @@ def index():                             #pylint: disable=W0102
 @app.route("/question", methods=["GET", "POST"])        # Define the question route "/question"
 def question(in__llm=llm_temp0,
              in__debug_mode=DEBUG_MODE,
-             in__debug_answer=debug_answer,              #pylint: disable=W0102
+             in__debug_answer=local_answer_dict,              #pylint: disable=W0102
              ):
     """
     Define the question route ("/question").
@@ -236,6 +239,7 @@ def question(in__llm=llm_temp0,
 
         if in__debug_mode is True:
             out_answer_dict = in__debug_answer
+            print(type(out_answer_dict),out_answer_dict)
 #            proc_question, answer, source = decompose_answer(in__json=out_answer_dict)
             proc_question = out_answer_dict["question"]
             answer = out_answer_dict["result"]["answer"]
