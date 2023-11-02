@@ -87,6 +87,16 @@ def get_answer(in__question,            # Define get_answer function        #pyl
     result = generate_answer.qa_chained_history(in__question=in__question,
                                                       in__llm=in__llm,
                                                       in__chat_history=in__chat_history)
+    print(result)
+    print(type(result))
+    print(result.keys())
+    print(result["result"]["source_documents"])
+    print(result["result"]["source_documents"][0])
+    print(type(result["result"]["source_documents"][0]))
+    print(result["result"]["source_documents"][0].page_content)
+    print(type(result["result"]["source_documents"][0].page_content))
+#    print(result["source_documents"][0])
+ #   print(type(result["source_documents"][0]))
     return result
 
 def get_local_answer(in__filepath):
