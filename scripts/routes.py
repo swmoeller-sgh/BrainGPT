@@ -43,6 +43,7 @@ ROOT_DIR = os.path.join(str(os.getenv("ROOT_DIR"))) # Define the root directory 
 BRAINGPT_INQUIRY_LOG_FILE = os.path.join(ROOT_DIR,  # Define the path to the query log file
                                          str(os.getenv("LOG_DIR")),
                                          str(os.getenv("QUERY_LOG_NAME")))
+FILEPATH_DEBUGANSWER_PKL = "data/10_raw/qa_chained_history_sample_answer.pkl"
 question_chain=[]
 # historic_communication = []             # Store historic communication
 chat_history = []
@@ -87,56 +88,22 @@ def get_answer(in__question,            # Define get_answer function        #pyl
     result = generate_answer.qa_chained_history(in__question=in__question,
                                                       in__llm=in__llm,
                                                       in__chat_history=in__chat_history)
-    print(result)
-    print(type(result))
-    print(result.keys())
-    print(result["result"]["source_documents"])
-    print(result["result"]["source_documents"][0])
-    print(type(result["result"]["source_documents"][0]))
-    print(result["result"]["source_documents"][0].page_content)
-    print(type(result["result"]["source_documents"][0].page_content))
+    with open("output.txt", "a") as f:
+        print("result:\n", result, file=f)
+        import pickle
+
+        print(type(result), file=f)
+        print("\n\nresult keys:",result.keys(), file=f)
+        print('\n\nresult["result"]["source_documents"]\n', result["result"]["source_documents"], file=f)
+        print('\n\nresult["result"]["source_documents"][0]\n',result["result"]["source_documents"][0], file=f)
+        print(type(result["result"]["source_documents"][0]), file=f)
+        print('\n\nresult["result"]["source_documents"][0].page_content\n', result["result"]["source_documents"][0].page_content, file=f)
+        print(type(result["result"]["source_documents"][0].page_content), file=f)
 #    print(result["source_documents"][0])
  #   print(type(result["source_documents"][0]))
+    with open("data/10_raw/qa_chained_history_sample_answer2.pkl", "wb") as pfile:
+        pickle.dump(result, pfile)
     return result
-
-def get_local_answer(in__filepath):
-    """
-    Read a local answer from a text file.
-
-    Parameters
-    ----------
-    in__filepath : str
-        File path to the local answer.
-
-    Returns
-    -------
-    str
-        Content of the local answer as a string.
-    """
-
-    try:
-        with open(in__filepath, "r", encoding="utf-8") as file:
-            sample_result = file.read()
-    except FileNotFoundError:
-        print(f"File '{in__filepath}' not found.")
-        sample_result = None
-
-    return sample_result
-
-
-def decompose_answer(in__json):
-
-    input_question = in__json['question']
-    output_answer = in__json['result']['answer']
-
-    # Extract and shorten the page content for each source document to a maximum of 50 letters
-    sources = []
-    for doc in in__json['result']['source_documents']:
-        short_content = doc['page_content'][0:50]
-        source_url = doc['metadata']['source']
-        sources.append([short_content, source_url])
-
-    return input_question, output_answer,sources
 
 
 def structure_answer(in__json):
@@ -185,10 +152,6 @@ def structure_answer(in__json):
     return nested_dict
 
 
-local_answer = get_local_answer(in__filepath="data/sample_answer02.txt")
-local_answer_dict = eval(local_answer.replace("'", "\""))   #pylint: disable=W0123
-#debug_answer = json.loads(local_answer) # type: ignore
-logging.info("Local answer loaded.")
 
 
 # [ROUTING definition]
@@ -209,7 +172,7 @@ def index():                             #pylint: disable=W0102
 @app.route("/question", methods=["GET", "POST"])        # Define the question route "/question"
 def question(in__llm=llm_temp0,
              in__debug_mode=DEBUG_MODE,
-             in__debug_answer=local_answer_dict,              #pylint: disable=W0102
+             in__debug_answer=FILEPATH_DEBUGANSWER_PKL
              ):
     """
     Define the question route ("/question").
@@ -237,39 +200,32 @@ def question(in__llm=llm_temp0,
 
     if request.method == "POST":
 
-        continue_conversation = request.form.get("c_conv")
-        logging.info("Contimue conversation: %s", continue_conversation)
+        flag_continue_conversation = request.form.get("c_conv")
+        logging.info("Contimue conversation: %s", flag_continue_conversation)
 
-        collection_business = request.form.get("business")
-        if collection_business == "True":
-            logging.info("Result of business checkbox: %s", collection_business)
+        flag_collection_business = request.form.get("business")
+        if flag_collection_business == "True":
+            logging.info("Result of business checkbox: %s", flag_collection_business)
 
         form_question = request.form["form_question"]
         logging.info("Question stated: %s\n",form_question)
 
         if in__debug_mode is True:
-            out_answer_dict = in__debug_answer
-            print(type(out_answer_dict),out_answer_dict)
-#            proc_question, answer, source = decompose_answer(in__json=out_answer_dict)
-            proc_question = out_answer_dict["question"]
-            answer = out_answer_dict["result"]["answer"]
-            source = out_answer_dict["result"]["source_documents"]
+            result = generate_answer.get_local_answer(in__debug_answer)
+
+            proc_question, answer, source, history = generate_answer.qa_chained_history_decompose(result)
+            logging.info("Local answer loaded.")
+
 
         else:
-            if continue_conversation != "True":
+            if flag_continue_conversation != "True":
                 chat_history=[]
-
-            out_answer_dict = get_answer(in__question=form_question,
-                                    in__chat_history=chat_history,
-                                    in__llm=in__llm)
-#            proc_question, answer, source = decompose_answer(in__json=out_answer_dict)
-
-            proc_question = out_answer_dict["question"]
-            answer = out_answer_dict["result"]["answer"]
-            source = out_answer_dict["result"]["source_documents"][:20]
+            result= generate_answer.qa_chained_history(in__question=form_question,
+                                                       in__chat_history=chat_history,
+                                                       in__llm=in__llm)
+            proc_question, answer, source, history = generate_answer.qa_chained_history_decompose(result)
             chat_history.append((proc_question,answer))
             logging.info("Chat history: %s\n",chat_history)
-
 
         # Store the updated chat history in the session
         session['chat_history'] = chat_history
