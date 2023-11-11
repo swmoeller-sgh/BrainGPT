@@ -49,4 +49,16 @@ Overview
 Reference (to websites, tutorials, etc.)
 ===============
 - xx
-- 
+
+
+## Module 2: Running the app
+
+```mermaid
+sequenceDiagram
+    participant web as Web Browser
+    participant brainapp as BrainGPT App
+    participant router as router.py
+    participant mail as Mail Service
+    participant db as Storage
+```
+
