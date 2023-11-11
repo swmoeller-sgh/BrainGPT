@@ -12,11 +12,12 @@ import os
 import logging
 import pickle
 
+from datetime import datetime
+
 import openai
 
 from dotenv import load_dotenv, find_dotenv
 
-# // TODO Neuinstallation env: langchain.vectorstores --> langchain.vectorstores.chroma wechseln
 from langchain.llms.openai import OpenAI
 from langchain.vectorstores.chroma import Chroma
 from langchain.embeddings import OpenAIEmbeddings
@@ -147,44 +148,44 @@ def qa_chained_history_decompose(in_qa_response):
      [('Content from source A', 'Source A'), ('Content from source B', 'Source B')],
      'User: What is the meaning of life?\nBot: The meaning of life is 42.')
     """
-    print(in_qa_response.keys())
+#    print(in_qa_response.keys())
 
     # Extracting question and answer
     qa_question = in_qa_response["question"]
     qa_answer = in_qa_response["answer"]
 
-    print("\nQuestion raised: ", qa_question)
-    print("\n Answer provided: ", qa_answer)
+#    print("\nQuestion raised: ", qa_question)
+#    print("\n Answer provided: ", qa_answer)
 
     # Extracting information from source documents
     qa_reference = []
     for source in in_qa_response["source_documents"]:
-        print("\n\nType of source: ", type(source))
-        qa_source_page_content = source.page_content[:250].replace("\n", "")
-        print("Extracted source original: ", source.page_content[:250].replace("\n", ""))
-        print("Extracted document: ", source.metadata["source"].replace("\n", ""))
+#        print("\n\nType of source: ", type(source))
+        qa_source_page_content = source.page_content[:50].replace("\n", "")
+#        print("Extracted source original: ", source.page_content[:250].replace("\n", ""))
+#        print("Extracted document: ", source.metadata["source"].replace("\n", ""))
         qa_source_file = source.metadata["source"].replace("\n", "")
         qa_reference.append((qa_source_page_content, qa_source_file))
 
-    print("\nConsolidated sources: ", qa_reference)
+#    print("\nConsolidated sources: ", qa_reference)
 
     # Extracting chat history
     qa_history = in_qa_response["chat_history"]
-    print("\n History chat: ", qa_history)
+#    print("\n History chat: ", qa_history)
 
     return qa_question, qa_answer, qa_reference, qa_history
 
 
 
-def recompose(in_dictionary:dict, in_question:str, in_answer:str, in_sources:list):
+def recompose(in_dictionary: dict, in_question: str, in_answer: str, in_sources: list) -> dict:
     """
     Add a new entry to the input dictionary with the provided question, answer, and sources.
 
     Parameters:
     - in_dictionary (dict): The input dictionary to which the new entry will be added.
-    - question (str): The question for the entry.
-    - answer (str): The answer for the entry.
-    - sources (list): A list of dictionaries containing 'extract' and 'file_link' keys for sources.
+    - in_question (str): The question for the entry.
+    - in_answer (str): The answer for the entry.
+    - in_sources (list): A list of dict containing 'extract' and 'file_link' keys for sources.
 
     Returns:
     dict: The updated dictionary with a new entry.
@@ -195,71 +196,26 @@ def recompose(in_dictionary:dict, in_question:str, in_answer:str, in_sources:lis
     ...                         [{"extract": "extract 1", "file_link": "sdsd\\sds\\ds"},
     ...                          {"extract": "extract 2", "file_link": "sdsd\\sds\\ds2"}])
     >>> print(result_dict)
-    {1: {'question': 'This is a question', 'answer': 'this is the answer',
-         'sources': [{'extract': 'extract 1', 'file_link': 'sdsd\\sds\\ds'},
-                     {'extract': 'extract 2', 'file_link': 'sdsd\\sds\\ds2'}]}}
+    {'2023-11-11 12:34:56.789': {'question': 'This is a question', 'answer': 'this is the answer',
+                                  'sources': [{'extract': 'extract 1', 
+                                               'file_link': 'sdsd\\sds\\ds'},
+                                              {'extract': 'extract 2', 
+                                               'file_link': 'sdsd\\sds\\ds2'}]}}
 
     """
-    def generate_dictionary(_question, _answer, _sources):
-        """
-        Generate a dictionary with the provided question, answer, and sources.
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
-        Parameters:
-        - question (str): The question for the entry.
-        - answer (str): The answer for the entry.
-        - sources (list): A list of dict containing 'extract' and 'file_link' keys for sources.
+    source_list = [{'extract': extract,
+                    'file_link': file_link} for extract, file_link in in_sources]
 
-        Returns:
-        dict: The generated dictionary.
+    in_dictionary[timestamp] = {
+        'question': in_question,
+        'answer': in_answer,
+        'sources': source_list
+    }
 
-        Example:
-        >>> generate_dictionary("Q", "A", [{"extract": "ex1", "file_link": "link1"},
-        ...                                  {"extract": "ex2", "file_link": "link2"}])
-        {'question': 'Q', 'answer': 'A',
-         'sources': [{'extract': 'ex1', 'file_link': 'link1'},
-                     {'extract': 'ex2', 'file_link': 'link2'}]}
-
-        """
-        source_list = []
-
-        for extract, file_link in _sources:
-            source_dict = {
-                'extract': extract,
-                'file_link': file_link
-            }
-            source_list.append(source_dict)
-
-
-        return {
-            'question': _question,
-            'answer': _answer,
-            'sources': source_list
-        }
-
-    def get_next_key_number(existing_keys):
-        """
-        Get the next available key number based on existing keys.
-
-        Parameters:
-        - existing_keys (list): List of existing keys.
-
-        Returns:
-        int: The next available key number.
-
-        Example:
-        >>> get_next_key_number([1, 2, 4])
-        5
-
-        """
-        if not existing_keys:
-            return 1
-        return max(existing_keys) + 1
-
-    key = get_next_key_number(in_dictionary.keys())
-    in_dictionary[key] = generate_dictionary(in_question,
-                                             in_answer,
-                                             in_sources)
     return in_dictionary
+
 
 def print_recomposed_dictionary(in_dictionary):
     """
@@ -304,18 +260,48 @@ def print_recomposed_dictionary(in_dictionary):
 
     """
     # Display the generated dictionary
-    for key, result in in_dictionary.items():
-        print(f"Key: {key}")
-        print(f"Question: {result['question']}")
-        print(f"Answer: {result['answer']}")
+    for _key, _result in in_dictionary.items():
+        print(f"Key: {_key}")
+        print(f"Question: {_result['question']}")
+        print(f"Answer: {_result['answer']}")
         print("Sources:")
 
-        for source_number, source in enumerate(result['sources'], 1):
+        for source_number, source in enumerate(_result['sources'], 1):
             print(f"  - Source {source_number}:")
             print(f"    - Extract: {source['extract']}")
             print(f"    - File Link: {source['file_link']}")
 
         print()
+
+def extract_qa_pairs(in_result_dict):
+    """
+    Extract questions and answers from a dictionary of QA responses.
+
+    Parameters:
+    - result_dict (dict): A dictionary containing QA response information.
+
+    Returns:
+    list: A list of tuples, each containing a question and its corresponding answer.
+
+    Example:
+    >>> result_dict = {1: {'question': 'Q1', 'answer': 'A1',
+    ...                     'sources': [{'extract': 'ex1', 'file_link': 'link1'},
+    ...                                 {'extract': 'ex2', 'file_link': 'link2'}]},
+    ...                2: {'question': 'Q2', 'answer': 'A2',
+    ...                    'sources': [{'extract': 'ex3', 'file_link': 'link3'},
+    ...                                {'extract': 'ex4', 'file_link': 'link4'}]}}
+    >>> result = extract_qa_pairs(result_dict)
+    >>> print(result)
+    [('Q1', 'A1'), ('Q2', 'A2')]
+    """
+    qa_pairs = []
+
+    for _, response in in_result_dict.items():
+        _question = response.get("question", "")
+        _answer = response.get("answer", "")
+        qa_pairs.append((_question, _answer))
+
+    return qa_pairs
 
 
 
@@ -325,7 +311,8 @@ def print_recomposed_dictionary(in_dictionary):
 
 def qa_chained_history(in__question: str,                 # Input question | #pylint: disable=W0102
                        in__llm: object,                   # Language model object
-                       in__chat_history: list = [],       # List of chat history (default empty)
+                       in__chat_history: list = [],       # List of chat history (default empty)\
+                                                          # chat_history:[(query, result["answer"])]
                        in__vectordb: Chroma = vectordb):  # VectorDB object (default is vectordb)
 
     """
@@ -412,14 +399,36 @@ if __name__ == "__main__":
     local_answer = get_local_answer(FILEPATH_DEBUGANSWER_PKL)
 
     question, answer, sources, history = qa_chained_history_decompose(local_answer)
-    print(f"question: {question}\nanswer: {answer}\nsources: {sources}\nhistory: {history}")
+#    print(f"question: {question}\nanswer: {answer}\nsources: {sources}\nhistory: {history}")
 
     result_dict = recompose(in_dictionary=result_dict,
                             in_question=question,
                             in_answer=answer,
                             in_sources=sources)
 
-    print_recomposed_dictionary(result_dict)
+    result_dict = recompose(in_dictionary=result_dict,
+                            in_question="This is a question",
+                            in_answer="this is the answer",
+                            in_sources=([
+                                {"extract": "extract 1", "file_link": "sdsd\\sds\\ds"},
+                                {"extract": "extract 2", "file_link": "sdsd\\sds\\ds2"}
+                                ])
+                            )
+
+    for key, value in result_dict.items():
+#        print("key", key)
+#        print("value:\n",value)
+#        print(key, value)
+        print(type(key))
+        print("question: ", value.get("question"))
+        print("answer: ", value.get("answer"))
+        print("sources: ", value.get("sources"))
+    print(result_dict)
+
+#    print_recomposed_dictionary(result_dict)
+    qa_pair_result = extract_qa_pairs(result_dict)
+
+#    print(qa_pair_result)
 
 
     logging.info("End of script: %s\n\n", os.path.basename(__file__))

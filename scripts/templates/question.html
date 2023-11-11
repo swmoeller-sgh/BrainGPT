@@ -60,7 +60,7 @@
                     <div class= "box item_answer">
                         <strong>Question: </strong> {{ question }}<br><br>
                         <strong>Answer: </strong> {{ answer }}<br><br>
-                        <strong>Reference: </strong> {{ source }}
+                        <strong>Source: </strong> {{ source }}
                     </div>            
                 {% endblock answer %}
 
@@ -69,15 +69,13 @@
                         <ul>
                             {% if history %}
                                 {% for key, value in history.items() %}
-                                    {% for question, qa_data in value.items() %}
-                                        <li>
-                                            <h3>{{ question }}</h3>
-                                            <ul>
-                                                <li><strong>Answer:</strong> {{ qa_data['Answer'] }}</li>
-                                                <li><strong>Source:</strong> {{ qa_data['Source'] or 'N/A' }}</li>
-                                            </ul>
-                                        </li>
-                                    {% endfor %}
+                                    <li>
+                                        <h3>{{ value.get("question") }}</h3>
+                                        <ul>
+                                            <li><strong>Answer:</strong> {{ value.get("answer") }}</li>
+                                            <li><strong>Source:</strong> {{ value.get("sources") or 'N/A' }}</li>
+                                        </ul>
+                                    </li>
                                 {% endfor %}
                             {% else %}
                                 <li>No history available</li>
