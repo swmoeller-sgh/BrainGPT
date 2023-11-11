@@ -60,7 +60,15 @@
                     <div class= "box item_answer">
                         <strong>Question: </strong> {{ question }}<br><br>
                         <strong>Answer: </strong> {{ answer }}<br><br>
-                        <strong>Source: </strong> {{ source }}
+                        <strong>Source</strong><br>
+                        {% for single_source in source %}
+
+                            <ul>
+                                <i>Source {{ loop.index }}</i>
+                                <li>Extract: {{ single_source[0] }} </li>
+                                <li>File-Link: {{ single_source[1] }} </li>
+                            </ul>
+                        {% endfor %}
                     </div>            
                 {% endblock answer %}
 
@@ -73,9 +81,13 @@
                                         <h3>{{ value.get("question") }}</h3>
                                         <ul>
                                             <li><strong>Answer</strong><br> {{ value.get("answer") }}</li>
-                                            <li><strong>Source:</strong> {{ value.get("sources") or 'N/A' }}</li>
+                                            <li><strong>Source</strong> <br></li>
                                             {% for source in value.get("sources") %}
-                                                Source: {{ loop.index0 }} {{ val }}<br>{{ source['extract'] }}<br>{{ source['file_link'] }}
+                                                <ul>
+                                                    <i>Source {{ loop.index }}</i>
+                                                    <li>Extract: {{ source['extract'] }} </li>
+                                                    <li>File-Link: {{ source['file_link'] }} </li><br>
+                                                </ul>
                                             {% endfor %}
                                         </ul>
                                     </li>
