@@ -141,7 +141,7 @@ def question(in__llm=llm_temp0,
 
             # extract single elements from the answer
             proc_question, answer, reference, history = \
-                generate_answer.qa_chained_history_decompose(result)
+                generate_answer.qa_chained_history_decompose(result)        #pylint: disable=W0612
             logging.info("Local answer loaded.")
 
             # add new question, answer and sources to chat_log
