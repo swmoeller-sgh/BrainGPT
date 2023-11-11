@@ -72,11 +72,15 @@
                                     <li>
                                         <h3>{{ value.get("question") }}</h3>
                                         <ul>
-                                            <li><strong>Answer:</strong> {{ value.get("answer") }}</li>
+                                            <li><strong>Answer</strong><br> {{ value.get("answer") }}</li>
                                             <li><strong>Source:</strong> {{ value.get("sources") or 'N/A' }}</li>
+                                            {% for source in value.get("sources") %}
+                                                Source: {{ loop.index0 }} {{ val }}<br>{{ source['extract'] }}<br>{{ source['file_link'] }}
+                                            {% endfor %}
                                         </ul>
                                     </li>
                                 {% endfor %}
+                            
                             {% else %}
                                 <li>No history available</li>
                             {% endif %}
